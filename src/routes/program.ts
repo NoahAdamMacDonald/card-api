@@ -70,7 +70,18 @@ data.get("/:id", (c) => {
     text: effect.text,
     }));
 
-
+    return c.json({
+    cardType: "program",
+    stats: {
+        name: base.name,
+        playCost: base.play_cost,
+        color: base.color,
+        effects: effectsWithTriggers,
+        traits,
+        bitEffect: base.bit_effect,
+        keywords,
+    },
+    });
 });
 
 
