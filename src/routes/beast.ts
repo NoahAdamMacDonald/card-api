@@ -1,7 +1,9 @@
 import { Hono } from "hono";
 import { db } from "../db";
+import { successResponse, errorResponse } from "../util/validation";
 
 import * as beastTypes from "../types/beast";
+import { stringBufferToString } from "hono/utils/html";
 
 const data = new Hono();
 
@@ -106,6 +108,68 @@ data.get("/:id", (c) => {
 });
 
 //POST
+data.post("/", async (c) => {
+    const body = await c.req.json().catch(()=>null);
+
+    if(!body?.stats) {
+        return c.json(
+            errorResponse([
+                {type: "missing required fields", fields: ["stats"]}
+            ]),
+            400
+        );
+    }
+
+    const s = body.stats;
+
+    //required fields
+    const missingFields = [];
+    if(!s.name) missingFields.push("name")
+    if (s.playCost == null) missingFields.push("playCost");
+
+    //validation check
+    const invalidFields = [];
+    if (typeof s.playCost !== "number" || s.playCost <= 0) {
+        invalidFields.push({
+            field: "playCost",
+            value: String(s.playCost),
+            reason: "must be Integer greater than 0"
+        });
+    }
+
+    if (missingFields.length > 0 || invalidFields.length > 0) {
+        const errors = [];
+
+        if (missingFields.length > 0) {
+            errors.push({
+                type: "missing required fields",
+                fields: missingFields
+            });
+        }
+
+        if (invalidFields.length > 0) {
+            errors.push({
+                type: "Invalid Value",
+                fields: invalidFields
+            });
+        }
+        return c.json(errorResponse(errors), 400);
+    }
+
+    //add new beast
+    db.query<unknown, [string, number, number, number, number, string]>(`
+        INSERT INTO beasts (name, play_cost, level, bts, evo_cost, evo_color)
+        VALUES (?, ?, ?, ?, ?, ?)    
+    `).run(    s.name,
+    s.playCost,
+    s.level ?? 0,
+    s.BTS ?? 0,
+    s.evoCost ?? 0,
+    s.evoColor ?? "colorless"
+    );
+
+    return c.json(successResponse("Successfully added new Beast"), 201);
+});
 
 //PATCH
 
