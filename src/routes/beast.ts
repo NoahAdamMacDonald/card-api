@@ -50,10 +50,30 @@ data.get("/:id", (c) => {
     `).all(id);
 
     //traits
-    const traits =db
+    const traits = db
     .query(`SELECT trait from beast_traits WHERE beast_id = ?`)
     .all(id)
     .map((t: any) => t.trait);
+
+    //restrictions
+    const restrictions = db
+    .query(`SELECT restriction FROM beast_restrictions WHERE beast_id = ?`)
+    .all(id)
+    .map((r: any) => r.restriction);
+
+    //keywords
+    const keywords = db
+    .query(`SELECT keyword FROM beast_keywords WHERE beast_id = ?`)
+    .all(id)
+    .map((k: any) => k.keyword);
+
+    //connect effects and triggers
+    const effectsWithTriggers = effects.map((effect: any) => ({
+    trigger: triggers
+        .filter((t: any) => t.effect_id === effect.id)
+        .map((t: any) => t.trigger),
+    text: effect.text,
+  }));
 });
 
 //POST
