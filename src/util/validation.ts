@@ -35,6 +35,37 @@ export function validateRequired(obj: any, fields: string[]) {
     };
 }
 
+export function validateStringArray(field: string, value: any) {
+    if (!Array.isArray(value)) {
+        return {
+        type: "Invalid Value",
+        fields: [
+            {
+            field,
+            value: JSON.stringify(value),
+            reason: "must be an array"
+            }
+        ]
+        };
+    }
+
+    if (!value.every((v) => typeof v === "string")) {
+        return {
+        type: "Invalid Value",
+        fields: [
+            {
+            field,
+            value: JSON.stringify(value),
+            reason: "all items must be strings"
+            }
+        ]
+        };
+    }
+
+    return null;
+}
+
+
 export function validatePositiveNumber(field: string, value: any) {
     if (typeof value === "number" && value > 0) return null;
 
