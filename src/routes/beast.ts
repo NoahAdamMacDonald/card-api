@@ -1,6 +1,13 @@
 import { Hono } from "hono";
 import { db } from "../db";
-import { successResponse, errorResponse } from "../util/validation";
+
+import { 
+    successResponse, 
+    errorResponse,
+    collectErrors,
+    validatePositiveNumber,
+    validateRequired 
+} from "../util/validation";
 
 import * as beastTypes from "../types/beast";
 
@@ -121,37 +128,12 @@ data.post("/", async (c) => {
 
     const s = body.stats;
 
-    //required fields
-    const missingFields = [];
-    if(!s.name) missingFields.push("name")
-    if (s.playCost == null) missingFields.push("playCost");
+    const errors = collectErrors(
+        validateRequired(s, ["name", "playCost"]),
+        validatePositiveNumber("playCost", s.playCost)
+    );
 
-    //validation check
-    const invalidFields = [];
-    if (typeof s.playCost !== "number" || s.playCost <= 0) {
-        invalidFields.push({
-            field: "playCost",
-            value: String(s.playCost),
-            reason: "must be Integer greater than 0"
-        });
-    }
-
-    if (missingFields.length > 0 || invalidFields.length > 0) {
-        const errors = [];
-
-        if (missingFields.length > 0) {
-            errors.push({
-                type: "missing required fields",
-                fields: missingFields
-            });
-        }
-
-        if (invalidFields.length > 0) {
-            errors.push({
-                type: "Invalid Value",
-                fields: invalidFields
-            });
-        }
+    if(errors.length > 0) {
         return c.json(errorResponse(errors), 400);
     }
 
