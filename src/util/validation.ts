@@ -76,4 +76,27 @@ export function applyStringUpdate(
     options.updatedFields.push(fullField);
 }
 
+export function applyNumberUpdate(
+    field: string,
+    value: any,
+    options: {
+        sqlField: string;
+        parent?: string;
+        updates: string[];
+        params: any[];
+        updatedFields: string[];
+        errors: any[];
+    }
+) {
+    if (value === undefined) return;
 
+    const validation = validatePositiveNumber(field, value);
+    if (validation) options.errors.push(validation);
+
+    options.updates.push(`${options.sqlField} = ?`);
+    options.params.push(value);
+
+    const fullField = options.parent ? `${options.parent}.${field}`: field;
+
+    options.updatedFields.push(fullField);
+}
