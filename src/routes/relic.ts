@@ -43,7 +43,17 @@ data.get("/:id", (c) => {
         SELECT effect_id, trigger, available
         FROM relic_effect_triggers
         WHERE effect_id IN (SELECT id FROM relic_effects WHERE relic_id = ?)  
+    `).all(id);
+
+    //keywords
+    const keywords = db
+    .query<relicTypes.RelicKeywordRow, [number]>(`
+        SELECT keyword FROM relic_keywords WHERE relic_id = ?
     `)
+    .all(id)
+    .map((k: any) => k.keyword);
+
+    
 });
 
 //POST
