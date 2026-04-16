@@ -126,7 +126,7 @@ data.get("/:id", (c) => {
   });
 });
 
-//POST
+
 //POST
 data.post("/", async (c) => {
     const body = await c.req.json().catch(() => null);
@@ -238,17 +238,8 @@ data.patch("/:id", async (c) => {
     const id = Number(c.req.param("id"));
     const body = await c.req.json().catch(() => null);
 
-    const exists = db.query<beastTypes.BeastRow, [number]>(`
-        SELECT id FROM beasts WHERE id = ?
-    `)
-    .get(id);
-
-    if(!exists) {
-        return c.json(
-            {error: "Beast not found", success: false},
-            404
-        );
-    }
+    const exists = checkBeastExist(c, id);
+    if (!exists) return exists;
 
     if (!body?.stats) {
         return c.json(
@@ -317,33 +308,48 @@ data.patch("/:id", async (c) => {
         updatedFields
     });
 
-    //update traits
-    if (s.traits !== undefined) {
-        const traitCheck = validateStringArray("traits", s.traits);
-        if (traitCheck) errors.push(traitCheck);
-        updatedFields.push("stats.traits");
-        db.query<unknown, [number]>(`DELETE FROM beast_traits WHERE beast_id = ?`).run(id);
-        for (const trait of s.traits) {
-            db.query<unknown, [number, string]>(`INSERT INTO beast_traits (beast_id, trait) VALUES (?, ?)`).run(id, trait);
-        }
-    }
+    validateNestedBeastStats(s, errors);
 
     if (errors.length > 0) {
         return c.json(errorResponse(errors), 400);
     }
 
-    if (updates.length === 0) {
-        return c.json(
-        errorResponse([
-            { type: "Invalid Value", fields: ["No valid fields provided"] }]), 400
-        );
+    if (s.effects !== undefined) {
+        replaceEffects("beast", id, s.effects);
+        updatedFields.push("stats.effects");
     }
 
-    //Send update
-    params.push(id);
-    db.query<unknown, any[]>(`
-    UPDATE beasts SET ${updates.join(", ")} WHERE id = ?
-    `).run(...params);
+    if (s.traits !== undefined) {
+        replaceList("beast_traits", "beast_id", id, s.traits, "trait");
+        updatedFields.push("stats.traits");
+    }
+
+    if (s.keywords !== undefined) {
+        replaceList("beast_keywords", "beast_id", id, s.keywords, "keyword");
+        updatedFields.push("stats.keywords");
+    }
+
+    if (s.restrictions !== undefined) {
+        replaceRestrictions(id, s.restrictions);
+        updatedFields.push("stats.restrictions");
+    }
+
+    if (s.soulEffects !== undefined) {
+        replaceSoulEffects(id, s.soulEffects);
+        updatedFields.push("stats.soulEffects");
+    }
+
+    if (s.special !== undefined) {
+        replaceSpecial(id, s.special);
+        updatedFields.push("stats.special");
+    }
+
+    if (updates.length > 0) {
+        params.push(id);
+        db.query<unknown, any[]>(`
+            UPDATE beasts SET ${updates.join(", ")} WHERE id = ?
+        `).run(...params);
+    }
 
     return c.json({
         message: "Successfully updated Beast",
@@ -352,21 +358,13 @@ data.patch("/:id", async (c) => {
     });
 });
 
+
 //DELETE
 data.delete("/:id", (c) => {
     const id = Number(c.req.param("id"));
 
-    const exists = db.query<beastTypes.BeastRow, [number]>(`
-        SELECT id FROM beasts WHERE id = ?
-    `)
-    .get(id);
-
-    if(!exists) {
-        return c.json(
-            {error: "Beast not found", success: false},
-            404
-        );
-    }
+    const exists = checkBeastExist(c, id);
+    if (!exists) return exists;
 
     //Delete
     db.query<unknown, [number]>(
@@ -378,5 +376,54 @@ data.delete("/:id", (c) => {
         success: true
     });
 });
+
+//Helpers
+function checkBeastExist(c: any, id: number) {
+    const exists = db.query<beastTypes.BeastRow, [number]>(`
+        SELECT id FROM beasts WHERE id = ?
+    `).get(id);
+
+    if (!exists) {
+        return c.json({ error: "Beast not found", success: false }, 404);
+    }
+    return exists;
+}
+
+function validateNestedBeastStats(s: any, errors: any[]) {
+    if (s.effects !== undefined) {
+        const effCheck = validateEffectsArray(s.effects);
+        if (effCheck) errors.push(effCheck);
+    }
+
+    if (s.traits !== undefined) {
+        const traitCheck = validateStringArray("traits", s.traits);
+        if (traitCheck) errors.push(traitCheck);
+    }
+
+    if (s.keywords !== undefined) {
+        const keyCheck = validateStringArray("keywords", s.keywords);
+        if (keyCheck) errors.push(keyCheck);
+    }
+
+    if (s.restrictions !== undefined) {
+        const restCheck = validateStringArray("restrictions", s.restrictions);
+        if (restCheck) errors.push(restCheck);
+    }
+
+    if (s.soulEffects !== undefined && !Array.isArray(s.soulEffects)) {
+        errors.push({
+            type: "Invalid Value",
+            fields: [
+                {
+                    field: "soulEffects",
+                    value: JSON.stringify(s.soulEffects),
+                    reason: "must be an array"
+                }
+            ]
+        });
+    }
+}
+
+
 
 export default data;
