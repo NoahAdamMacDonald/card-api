@@ -9,9 +9,19 @@ import {
     validatePositiveNumber,
     validateRequired,
     validateStringArray,
+    validateEffectsArray,
     applyNumberUpdate,
-    applyStringUpdate 
+    applyStringUpdate
 } from "../util/validation";
+
+import { 
+    replaceEffects,
+    replaceKeywords,
+    replaceList,
+    replaceRestrictions,
+    replaceSoulEffects,
+    replaceSpecial
+} from "../util/dbHelpers";
 
 const data = new Hono();
 
@@ -114,14 +124,33 @@ data.post("/", async (c) => {
         validatePositiveNumber("playCost", s.playCost)
     );
 
-    if(errors.length > 0) {
+    validateNestedProgramStats(s, errors);
+
+    if (errors.length > 0) {
         return c.json(errorResponse(errors), 400);
     }
 
-    db.query<unknown, [string, number, string, string]>(`
+    const result = db.query<
+        unknown,
+        [string, number, string, string]
+    >(`
         INSERT INTO programs (name, play_cost, color, bit_effect)
         VALUES (?, ?, ?, ?)
     `).run(s.name, s.playCost, s.color, s.bitEffect);
+
+    const programId = result.lastInsertRowid as number;
+
+    if (s.effects) {
+        replaceEffects("program", programId, s.effects);
+    }
+
+    if (s.traits) {
+        replaceList("program_traits", "program_id", programId, s.traits, "trait");
+    }
+
+    if (s.keywords) {
+        replaceKeywords("program_keywords", "program_id", programId, s.keywords);
+    }
 
     return c.json(successResponse("Successfully added new Program"), 201);
 });
@@ -131,17 +160,8 @@ data.patch("/:id", async (c) => {
     const id = Number(c.req.param("id"));
     const body = await c.req.json().catch(() => null);
 
-    const exists = db.query<{id: number}, [number]>(`
-        SELECT id FROM programs WHERE id = ?
-    `)
-    .get(id);
-
-    if(!exists) {
-        return c.json(
-            {error: "Program not found", success: false},
-            404
-        );
-    }
+    const exists = checkProgramExist(c, id);
+    if (!exists) return exists;
 
     if (!body?.stats) {
         return c.json(
@@ -157,7 +177,7 @@ data.patch("/:id", async (c) => {
     const updatedFields: string[] = [];
     const errors: any[] = [];
 
-    //Apply updates
+    // Base stat updates
     applyStringUpdate("name", s.name, {
         sqlField: "name",
         parent: "stats",
@@ -191,33 +211,33 @@ data.patch("/:id", async (c) => {
         updatedFields
     });
 
-    //update traits
-    if (s.traits !== undefined) {
-        const traitCheck = validateStringArray("traits", s.traits);
-        if (traitCheck) errors.push(traitCheck);
-        updatedFields.push("stats.traits");
-        db.query<unknown, [number]>(`DELETE FROM program_traits WHERE program_id = ?`).run(id);
-        for (const trait of s.traits) {
-            db.query<unknown, [number, string]>(`INSERT INTO program_traits (program_id, trait) VALUES (?, ?)`).run(id, trait);
-        }
-    }
+    validateNestedProgramStats(s, errors);
 
     if (errors.length > 0) {
         return c.json(errorResponse(errors), 400);
     }
 
-    if (updates.length === 0) {
-        return c.json(
-        errorResponse([
-            { type: "Invalid Value", fields: ["No valid fields provided"] }]), 400
-        );
+    if (s.effects !== undefined) {
+        replaceEffects("program", id, s.effects);
+        updatedFields.push("stats.effects");
     }
 
-    //Send update
-    params.push(id);
-    db.query<unknown, any[]>(`
-    UPDATE programs SET ${updates.join(", ")} WHERE id = ?
-    `).run(...params);
+    if (s.traits !== undefined) {
+        replaceList("program_traits", "program_id", id, s.traits, "trait");
+        updatedFields.push("stats.traits");
+    }
+
+    if (s.keywords !== undefined) {
+        replaceKeywords("program_keywords", "program_id", id, s.keywords);
+        updatedFields.push("stats.keywords");
+    }
+
+    if (updates.length > 0) {
+        params.push(id);
+        db.query<unknown, any[]>(`
+            UPDATE programs SET ${updates.join(", ")} WHERE id = ?
+        `).run(...params);
+    }
 
     return c.json({
         message: "Successfully updated Program",
@@ -226,21 +246,13 @@ data.patch("/:id", async (c) => {
     });
 });
 
+
 //DELETE
 data.delete("/:id", (c) => {
     const id = Number(c.req.param("id"));
 
-    const exists = db.query<{id: number}, [number]>(`
-        SELECT id FROM programs WHERE id = ?
-    `)
-    .get(id);
-
-    if(!exists) {
-        return c.json(
-            {error: "Program not found", success: false},
-            404
-        );
-    }
+    const exists = checkProgramExist(c, id);
+    if (!exists) return exists;
 
     //Delete
     db.query<unknown, [number]>(
@@ -252,5 +264,36 @@ data.delete("/:id", (c) => {
         success: true
     });
 });
+
+//Helper
+function checkProgramExist(c: any, id: number) {
+    const exists = db.query<programTypes.ProgramRow, [number]>(`
+        SELECT id FROM programs WHERE id = ?
+    `).get(id);
+
+    if (!exists) {
+        return c.json({ error: "Program not found", success: false }, 404);
+    }
+
+    return exists;
+}
+
+function validateNestedProgramStats(s: any, errors: any[]) {
+    if (s.effects !== undefined) {
+        const effCheck = validateEffectsArray(s.effects);
+        if (effCheck) errors.push(effCheck);
+    }
+
+    if (s.traits !== undefined) {
+        const traitCheck = validateStringArray("traits", s.traits);
+        if (traitCheck) errors.push(traitCheck);
+    }
+
+    if (s.keywords !== undefined) {
+        const keyCheck = validateStringArray("keywords", s.keywords);
+        if (keyCheck) errors.push(keyCheck);
+    }
+}
+
 
 export default data;
