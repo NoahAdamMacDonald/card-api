@@ -8,9 +8,20 @@ import {
     collectErrors,
     validatePositiveNumber,
     validateRequired,
+    validateStringArray,
+    validateEffectsArray,
     applyNumberUpdate,
     applyStringUpdate
 } from "../util/validation";
+
+import { 
+    replaceEffects,
+    replaceKeywords,
+    replaceList,
+    replaceRestrictions,
+    replaceSoulEffects,
+    replaceSpecial
+} from "../util/dbHelpers";
 
 const data = new Hono();
 
@@ -103,34 +114,41 @@ data.post("/", async (c) => {
         validatePositiveNumber("playCost", s.playCost)
     );
 
-    if(errors.length > 0) {
+    validateNestedRelicStats(s, errors);
+
+    if (errors.length > 0) {
         return c.json(errorResponse(errors), 400);
     }
 
-    db.query<unknown, [string, number, string, string]>(`
+    const result = db.query<
+        unknown,
+        [string, number, string, string]
+    >(`
         INSERT INTO relics (name, play_cost, color, bit_effect)
         VALUES (?, ?, ?, ?)
     `).run(s.name, s.playCost, s.color, s.bitEffect);
 
+    const relicId = result.lastInsertRowid as number;
+
+    if (s.effects) {
+        replaceEffects("relic", relicId, s.effects);
+    }
+
+    if (s.keywords) {
+        replaceKeywords("relic_keywords", "relic_id", relicId, s.keywords);
+    }
+
     return c.json(successResponse("Successfully added new Relic"), 201);
 });
+
 
 //PATCH
 data.patch("/:id", async (c) => {
     const id = Number(c.req.param("id"));
     const body = await c.req.json().catch(() => null);
 
-    const exists = db.query<{id: number}, [number]>(`
-        SELECT id FROM relics WHERE id = ?
-    `)
-    .get(id);
-
-    if(!exists) {
-        return c.json(
-            {error: "Relic not found", success: false},
-            404
-        );
-    }
+    const exists = checkRelicExist(c, id);
+    if (!exists) return exists;
 
     if (!body?.stats) {
         return c.json(
@@ -146,7 +164,6 @@ data.patch("/:id", async (c) => {
     const updatedFields: string[] = [];
     const errors: any[] = [];
 
-    //Apply updates
     applyStringUpdate("name", s.name, {
         sqlField: "name",
         parent: "stats",
@@ -180,22 +197,30 @@ data.patch("/:id", async (c) => {
         updatedFields
     });
 
+    validateNestedRelicStats(s, errors);
+
     if (errors.length > 0) {
         return c.json(errorResponse(errors), 400);
     }
 
-    if (updates.length === 0) {
-        return c.json(
-        errorResponse([
-            { type: "Invalid Value", fields: ["No valid fields provided"] }]), 400
-        );
+    //Nested updates
+    if (s.effects !== undefined) {
+        replaceEffects("relic", id, s.effects);
+        updatedFields.push("stats.effects");
+    }
+
+    if (s.keywords !== undefined) {
+        replaceKeywords("relic_keywords", "relic_id", id, s.keywords);
+        updatedFields.push("stats.keywords");
     }
 
     //Send update
-    params.push(id);
-    db.query<unknown, any[]>(`
-    UPDATE relics SET ${updates.join(", ")} WHERE id = ?
-    `).run(...params);
+    if (updates.length > 0) {
+        params.push(id);
+        db.query<unknown, any[]>(`
+            UPDATE relics SET ${updates.join(", ")} WHERE id = ?
+        `).run(...params);
+    }
 
     return c.json({
         message: "Successfully updated Relic",
@@ -204,21 +229,13 @@ data.patch("/:id", async (c) => {
     });
 });
 
+
 //DELETE
 data.delete("/:id", (c) => {
     const id = Number(c.req.param("id"));
 
-    const exists = db.query<{id: number}, [number]>(`
-        SELECT id FROM relics WHERE id = ?
-    `)
-    .get(id);
-
-    if(!exists) {
-        return c.json(
-            {error: "Relic not found", success: false},
-            404
-        );
-    }
+    const exists = checkRelicExist(c, id);
+    if (!exists) return exists;
 
     //Delete
     db.query<unknown, [number]>(
@@ -230,5 +247,31 @@ data.delete("/:id", (c) => {
         success: true
     });
 });
+
+//helpers
+function checkRelicExist(c: any, id: number) {
+    const exists = db.query<relicTypes.RelicRow, [number]>(`
+        SELECT id FROM relics WHERE id = ?
+    `).get(id);
+
+    if (!exists) {
+        return c.json({ error: "Relic not found", success: false }, 404);
+    }
+
+    return exists;
+}
+
+function validateNestedRelicStats(s: any, errors: any[]) {
+    if (s.effects !== undefined) {
+        const effCheck = validateEffectsArray(s.effects);
+        if (effCheck) errors.push(effCheck);
+    }
+
+    if (s.keywords !== undefined) {
+        const keyCheck = validateStringArray("keywords", s.keywords);
+        if (keyCheck) errors.push(keyCheck);
+    }
+}
+
 
 export default data;
