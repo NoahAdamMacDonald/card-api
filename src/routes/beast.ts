@@ -156,5 +156,30 @@ data.post("/", async (c) => {
 //PATCH
 
 //DELETE
+data.delete("/:id", (c) => {
+    const id = Number(c.req.param("id"));
+
+    const exists = db.query<beastTypes.BeastRow, [number]>(`
+        SELECT id FROM beasts WHERE id = ?
+    `)
+    .get(id);
+
+    if(!exists) {
+        return c.json(
+            {error: "Beast not found", success: false},
+            404
+        );
+    }
+
+    //Delete beast
+    db.query<unknown, [number]>(
+        `DELETE FROM beasts WHERE id = ?`
+    ).run(id);
+
+    return c.json({
+        message: "Successfully deleted Beast",
+        success: true
+    });
+});
 
 export default data;
