@@ -22,7 +22,7 @@ data.get("/:id", (c) => {
 
     //base level
     const base = db
-    .query(`
+    .query<beastTypes.BeastRow, [number]>(`
         SELECT id, name, play_cost, level, bts, evo_cost, evo_color
         FROM beasts where id = ?
     `).get(id);
@@ -34,11 +34,11 @@ data.get("/:id", (c) => {
     
     //effects
     const effects = db
-    .query(`SELECT id, text FROM beast_effects WHERE beast_id = ?`).all(id);
+    .query<beastTypes.BeastEffectRow, [number]>(`SELECT id, text FROM beast_effects WHERE beast_id = ?`).all(id);
 
     //effects triggers
     const triggers = db
-    .query(`
+    .query<beastTypes.BeastTriggerRow, [number]>(`
         SELECT effect_id, trigger 
         FROM beast_effect_triggers 
         WHERE effect_id IN (SELECT id FROM beast_effects WHERE beast_id = ?) 
@@ -46,11 +46,13 @@ data.get("/:id", (c) => {
 
     //special
     const special = db
-    .query(`SELECT name, text FROM beast_special WHERE beast_id = ?`).get(id);
+    .query<beastTypes.BeastSpecialRow, number>(`
+        SELECT name, text FROM beast_special WHERE beast_id = ?
+    `).get(id);
 
     //soul effects
     const soulEffects = db
-    .query(`
+    .query<beastTypes.BeastSoulEffectRow, [number]>(`
         SELECT trigger, available, text
         FROM beast_soul_effects
         WHERE beast_id = ?
@@ -58,20 +60,21 @@ data.get("/:id", (c) => {
 
     //traits
     const traits = db
-    .query(`SELECT trait from beast_traits WHERE beast_id = ?`)
+    .query<beastTypes.BeastTraitRow, [number]>(`SELECT trait from beast_traits WHERE beast_id = ?`)
     .all(id)
     .map((t: any) => t.trait);
 
     //restrictions
     const restrictions = db
-    .query(`SELECT restriction FROM beast_restrictions WHERE beast_id = ?`)
+    .query<beastTypes.BeastRestrictionRow, [number]>(`SELECT restriction FROM beast_restrictions WHERE beast_id = ?`)
     .all(id)
     .map((r: any) => r.restriction);
 
     //keywords
     const keywords = db
-    .query(`SELECT keyword FROM beast_keywords WHERE beast_id = ?`)
-    .all(id)
+    .query<beastTypes.BeastKeywordRow, [number]>(
+        `SELECT keyword FROM beast_keywords WHERE beast_id = ?`
+    ).all(id)
     .map((k: any) => k.keyword);
 
     //connect effects and triggers
