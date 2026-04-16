@@ -44,6 +44,24 @@ data.get("/:id", (c) => {
         FROM program_effect_triggers
         WHERE effect_id IN (SELECT id FROM program_effects WHERE program_id = ?)
     `).all(id);
+
+    //traits
+    const traits = db
+    .query<programTypes.ProgramTraitRow, [number]>(`
+        SELECT trait FROM program_traits WHERE program_id = ?
+    `)
+    .all(id)
+    .map((t) => t.trait);
+
+    //keywords
+    const keywords = db
+    .query<programTypes.ProgramKeywordRow, [number]>(`
+        SELECT keyword FROM program_keywords WHERE program_id = ?
+    `)
+    .all(id)
+    .map((k: any) => k.keyword);
+
+
 });
 
 
