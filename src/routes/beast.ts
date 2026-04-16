@@ -160,7 +160,8 @@ data.post("/", async (c) => {
     db.query<unknown, [string, number, number, number, number, string]>(`
         INSERT INTO beasts (name, play_cost, level, bts, evo_cost, evo_color)
         VALUES (?, ?, ?, ?, ?, ?)    
-    `).run(    s.name,
+    `).run(
+    s.name,
     s.playCost,
     s.level ?? 0,
     s.BTS ?? 0,
