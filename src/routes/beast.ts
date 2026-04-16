@@ -7,6 +7,7 @@ import {
     collectErrors,
     validatePositiveNumber,
     validateRequired,
+    validateStringArray,
     applyNumberUpdate,
     applyStringUpdate
 } from "../util/validation";
@@ -238,6 +239,17 @@ data.patch("/:id", async (c) => {
         params,
         updatedFields
     });
+
+    //update traits
+    if (s.traits !== undefined) {
+        const traitCheck = validateStringArray("traits", s.traits);
+        if (traitCheck) errors.push(traitCheck);
+        updatedFields.push("stats.traits");
+        db.query<unknown, [number]>(`DELETE FROM beast_traits WHERE beast_id = ?`).run(id);
+        for (const trait of s.traits) {
+            db.query<unknown, [number, string]>(`INSERT INTO beast_traits (beast_id, trait) VALUES (?, ?)`).run(id, trait);
+        }
+    }
 
     if (errors.length > 0) {
         return c.json(errorResponse(errors), 400);
