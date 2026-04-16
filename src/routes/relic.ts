@@ -60,7 +60,19 @@ data.get("/:id", (c) => {
         .map((t) => t.trigger),
     available: triggers.find((t) => t.effect_id === effect.id)?.available ?? null,
     text: effect.text,
-  }));
+    }));
+
+    return c.json({
+    cardType: "relic",
+    stats: {
+    name: base.name,
+        playCost: base.play_cost,
+        color: base.color,
+        effects: effectsWithTriggers,
+        bitEffect: base.bit_effect,
+        keywords,
+    },
+    });
 });
 
 //POST
