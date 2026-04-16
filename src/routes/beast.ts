@@ -24,6 +24,11 @@ data.get("/:id", (c) => {
         SELECT id, name, play_cost, level, bts, evo_cost, evo_color
         FROM beasts where id = ?
     `).get(id);
+
+    //error handle
+    if (!base) {
+        return c.json({ error: "Beast not found" }, 404);
+    }
     
     //effects
     const effects = db
@@ -73,7 +78,26 @@ data.get("/:id", (c) => {
         .filter((t: any) => t.effect_id === effect.id)
         .map((t: any) => t.trigger),
     text: effect.text,
-  }));
+    }));
+
+    //return
+      return c.json({
+    cardType: "beast",
+    stats: {
+        name: base.name,
+        playCost: base.play_cost,
+        level: base.level,
+        BTS: base.bts,
+        evoCost: base.evo_cost,
+        evoColor: base.evo_color,
+        effects: effectsWithTriggers,
+        special: special ?? null,
+        soulEffects,
+        restrictions,
+        traits,
+        keywords,
+    },
+  });
 });
 
 //POST
