@@ -5,7 +5,7 @@ import { biomeSchema } from "./schema/biome";
 import { programSchema } from "./schema/program";
 import { relicSchema } from "./schema/relic";
 
-export const db = new Database("/data/database.sqlite");
+export const db = new Database("./data/database.sqlite");
 
 db.run(`PRAGMA foreign_keys = ON;`);
 

@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS beasts (
 
 CREATE TABLE IF NOT EXISTS beast_effects (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  beast_id INTEGER NOT NULL,    
+  beast_id INTEGER NOT NULL,
   text TEXT NOT NULL,
   FOREIGN KEY (beast_id) REFERENCES beasts(id) ON DELETE CASCADE
 );
@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS beast_effect_triggers (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   effect_id INTEGER NOT NULL,
   trigger TEXT NOT NULL,
+  available TEXT, 
   FOREIGN KEY (effect_id) REFERENCES beast_effects(id) ON DELETE CASCADE
 );
 
