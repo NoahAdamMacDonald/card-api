@@ -1,7 +1,14 @@
 import { Hono } from "hono";
 import { db } from "../db";
 import * as biomeTypes from "../types/biome";
-import { successResponse, errorResponse } from "../util/validation";
+
+import { 
+    successResponse, 
+    errorResponse,
+    collectErrors,
+    validatePositiveNumber,
+    validateRequired 
+} from "../util/validation";
 
 const data = new Hono();
 
@@ -85,9 +92,35 @@ data.get("/:id", (c) => {
     });
 });
 
-
-
 //POST
+data.post("/", async (c) => {
+    const body = await c.req.json().catch(() => null);
+
+    if (!body?.stats) {
+        return c.json(
+            errorResponse([{ type: "missing required fields", fields: ["stats"] }]),
+            400
+        );
+    }
+
+    const s = body.stats;
+
+    const errors = collectErrors(
+        validateRequired(s, ["name", "playCost", "color", "bitEffect"]),
+        validatePositiveNumber("playCost", s.playCost)
+    );
+
+    if(errors.length > 0) {
+        return c.json(errorResponse(errors), 400);
+    }
+
+    db.query<unknown, [string, number, string, string]>(`
+        INSERT INTO biomes (name, play_cost, color, bit_effect)
+        VALUES (?, ?, ?, ?)
+    `).run(s.name, s.playCost, s.color, s.bitEffect);
+
+    return c.json(successResponse("Successfully added new Biome"), 201);
+});
 
 //PATCH
 

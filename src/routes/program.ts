@@ -1,7 +1,15 @@
 import { Hono } from "hono";
 import { db } from "../db";
 import * as programTypes from "../types/program";
-import { successResponse, errorResponse } from "../util/validation";
+
+import { 
+    successResponse, 
+    errorResponse,
+    collectErrors,
+    validatePositiveNumber,
+    validateRequired 
+} from "../util/validation";
+
 const data = new Hono();
 
 //GET
@@ -98,35 +106,12 @@ data.post("/", async (c) => {
 
     const s = body.stats;
 
-    //Required Fields
-    const missingFields = [];
-    if (!s.name) missingFields.push("name");
-    if (s.playCost == null) missingFields.push("playCost");
-    if (!s.color) missingFields.push("color");
-    if (!s.bitEffect) missingFields.push("bitEffect");
+    const errors = collectErrors(
+        validateRequired(s, ["name", "playCost", "color", "bitEffect"]),
+        validatePositiveNumber("playCost", s.playCost)
+    );
 
-
-    //Validation check
-    const invalidFields = [];
-
-    if (typeof s.playCost !== "number" || s.playCost <= 0) {
-        invalidFields.push({
-            field: "playCost",
-            value: String(s.playCost),
-            reason: "must be Integer greater than 0"
-        });
-    }
-
-    if (missingFields.length || invalidFields.length) {
-        const errors = [];
-        if (missingFields.length) {
-            errors.push({ type: "missing required fields", fields: missingFields });
-        }
-
-        if (invalidFields.length) {
-            errors.push({ type: "Invalid Value", fields: invalidFields });
-        }
-
+    if(errors.length > 0) {
         return c.json(errorResponse(errors), 400);
     }
 
