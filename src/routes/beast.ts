@@ -3,7 +3,6 @@ import { db } from "../db";
 import { successResponse, errorResponse } from "../util/validation";
 
 import * as beastTypes from "../types/beast";
-import { stringBufferToString } from "hono/utils/html";
 
 const data = new Hono();
 
