@@ -9,9 +9,19 @@ import {
     validatePositiveNumber,
     validateRequired,
     validateStringArray,
+    validateEffectsArray,
     applyNumberUpdate,
     applyStringUpdate
 } from "../util/validation";
+
+import { 
+    replaceEffects,
+    replaceKeywords,
+    replaceList,
+    replaceRestrictions,
+    replaceSoulEffects,
+    replaceSpecial
+} from "../util/dbHelpers";
 
 const data = new Hono();
 
@@ -113,34 +123,45 @@ data.post("/", async (c) => {
         validatePositiveNumber("playCost", s.playCost)
     );
 
-    if(errors.length > 0) {
+    validateNestedBiomeStats(s, errors);
+
+    if (errors.length > 0) {
         return c.json(errorResponse(errors), 400);
     }
 
-    db.query<unknown, [string, number, string, string]>(`
+    const result = db.query<
+        unknown,
+        [string, number, string, string]
+    >(`
         INSERT INTO biomes (name, play_cost, color, bit_effect)
         VALUES (?, ?, ?, ?)
     `).run(s.name, s.playCost, s.color, s.bitEffect);
 
+    const biomeId = result.lastInsertRowid as number;
+
+    if (s.effects) {
+        replaceEffects("biome", biomeId, s.effects);
+    }
+
+    if (s.traits) {
+        replaceList("biome_traits", "biome_id", biomeId, s.traits, "trait");
+    }
+
+    if (s.keywords) {
+        replaceKeywords("biome_keywords", "biome_id", biomeId, s.keywords);
+    }
+
     return c.json(successResponse("Successfully added new Biome"), 201);
 });
+
 
 //PATCH
 data.patch("/:id", async (c) => {
     const id = Number(c.req.param("id"));
     const body = await c.req.json().catch(() => null);
 
-    const exists = db.query<{id: number}, [number]>(`
-        SELECT id FROM biomes WHERE id = ?
-    `)
-    .get(id);
-
-    if(!exists) {
-        return c.json(
-            {error: "Biome not found", success: false},
-            404
-        );
-    }
+    const exists = checkBiomeExist(c, id);
+    if (!exists) return exists;
 
     if (!body?.stats) {
         return c.json(
@@ -156,7 +177,6 @@ data.patch("/:id", async (c) => {
     const updatedFields: string[] = [];
     const errors: any[] = [];
 
-    //Apply updates
     applyStringUpdate("name", s.name, {
         sqlField: "name",
         parent: "stats",
@@ -190,33 +210,33 @@ data.patch("/:id", async (c) => {
         updatedFields
     });
 
-    //update traits
-    if (s.traits !== undefined) {
-        const traitCheck = validateStringArray("traits", s.traits);
-        if (traitCheck) errors.push(traitCheck);
-        updatedFields.push("stats.traits");
-        db.query<unknown, [number]>(`DELETE FROM biome_traits WHERE biome_id = ?`).run(id);
-        for (const trait of s.traits) {
-            db.query<unknown, [number, string]>(`INSERT INTO biome_traits (biome_id, trait) VALUES (?, ?)`).run(id, trait);
-        }
-    }
+    validateNestedBiomeStats(s, errors);
 
     if (errors.length > 0) {
         return c.json(errorResponse(errors), 400);
     }
 
-    if (updates.length === 0) {
-        return c.json(
-        errorResponse([
-            { type: "Invalid Value", fields: ["No valid fields provided"] }]), 400
-        );
+    if (s.effects !== undefined) {
+        replaceEffects("biome", id, s.effects);
+        updatedFields.push("stats.effects");
     }
 
-    //Send update
-    params.push(id);
-    db.query<unknown, any[]>(`
-    UPDATE biomes SET ${updates.join(", ")} WHERE id = ?
-    `).run(...params);
+    if (s.traits !== undefined) {
+        replaceList("biome_traits", "biome_id", id, s.traits, "trait");
+        updatedFields.push("stats.traits");
+    }
+
+    if (s.keywords !== undefined) {
+        replaceKeywords("biome_keywords", "biome_id", id, s.keywords);
+        updatedFields.push("stats.keywords");
+    }
+
+    if (updates.length > 0) {
+        params.push(id);
+        db.query<unknown, any[]>(`
+            UPDATE biomes SET ${updates.join(", ")} WHERE id = ?
+        `).run(...params);
+    }
 
     return c.json({
         message: "Successfully updated Biome",
@@ -226,21 +246,13 @@ data.patch("/:id", async (c) => {
 });
 
 
+
 //DELETE
 data.delete("/:id", (c) => {
     const id = Number(c.req.param("id"));
 
-    const exists = db.query<{id: number}, [number]>(`
-        SELECT id FROM biomes WHERE id = ?
-    `)
-    .get(id);
-
-    if(!exists) {
-        return c.json(
-            {error: "Biome not found", success: false},
-            404
-        );
-    }
+    const exists = checkBiomeExist(c, id);
+    if (!exists) return exists;
 
     //Delete
     db.query<unknown, [number]>(
@@ -252,5 +264,36 @@ data.delete("/:id", (c) => {
         success: true
     });
 });
+
+//Helper
+function checkBiomeExist(c: any, id: number) {
+    const exists = db.query<biomeTypes.BiomeRow, [number]>(`
+        SELECT id FROM biomes WHERE id = ?
+    `).get(id);
+
+    if (!exists) {
+        return c.json({ error: "Biome not found", success: false }, 404);
+    }
+
+    return exists;
+}
+
+function validateNestedBiomeStats(s: any, errors: any[]) {
+    if (s.effects !== undefined) {
+        const effCheck = validateEffectsArray(s.effects);
+        if (effCheck) errors.push(effCheck);
+    }
+
+    if (s.traits !== undefined) {
+        const traitCheck = validateStringArray("traits", s.traits);
+        if (traitCheck) errors.push(traitCheck);
+    }
+
+    if (s.keywords !== undefined) {
+        const keyCheck = validateStringArray("keywords", s.keywords);
+        if (keyCheck) errors.push(keyCheck);
+    }
+}
+
 
 export default data;
