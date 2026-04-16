@@ -125,5 +125,30 @@ data.post("/", async (c) => {
 //PATCH
 
 //DELETE
+data.delete("/:id", (c) => {
+    const id = Number(c.req.param("id"));
+
+    const exists = db.query<{id: number}, [number]>(`
+        SELECT id FROM biomes WHERE id = ?
+    `)
+    .get(id);
+
+    if(!exists) {
+        return c.json(
+            {error: "Biome not found", success: false},
+            404
+        );
+    }
+
+    //Delete
+    db.query<unknown, [number]>(
+        `DELETE FROM biomes WHERE id = ?`
+    ).run(id);
+
+    return c.json({
+        message: "Successfully deleted Biome",
+        success: true
+    });
+});
 
 export default data;

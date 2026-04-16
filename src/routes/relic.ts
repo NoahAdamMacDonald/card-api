@@ -116,5 +116,30 @@ data.post("/", async (c) => {
 //PATCH
 
 //DELETE
+data.delete("/:id", (c) => {
+    const id = Number(c.req.param("id"));
+
+    const exists = db.query<{id: number}, [number]>(`
+        SELECT id FROM relics WHERE id = ?
+    `)
+    .get(id);
+
+    if(!exists) {
+        return c.json(
+            {error: "Relic not found", success: false},
+            404
+        );
+    }
+
+    //Delete
+    db.query<unknown, [number]>(
+        `DELETE FROM relics WHERE id = ?`
+    ).run(id);
+
+    return c.json({
+        message: "Successfully deleted Relic",
+        success: true
+    });
+});
 
 export default data;
