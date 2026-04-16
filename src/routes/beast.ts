@@ -15,6 +15,18 @@ data.get("/", (c)=> {
     return c.json(rows);
 });
 
+data.get("/:id", (c) => {
+    const id = Number(c.req.param("id"))
+
+    //base level
+    const base = db
+    .query(`
+        SELECT id, name, play_cost, level, bts, evo_cost, evo_color
+        FROM beasts where id = ?
+    `).get(id);
+
+});
+
 //POST
 
 //PATCH
