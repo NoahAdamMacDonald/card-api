@@ -8,9 +8,19 @@ import {
     validatePositiveNumber,
     validateRequired,
     validateStringArray,
+    validateEffectsArray,
     applyNumberUpdate,
     applyStringUpdate
 } from "../util/validation";
+
+import { 
+    replaceEffects,
+    replaceKeywords,
+    replaceList,
+    replaceRestrictions,
+    replaceSoulEffects,
+    replaceSpecial
+} from "../util/dbHelpers";
 
 import * as beastTypes from "../types/beast";
 
@@ -117,13 +127,14 @@ data.get("/:id", (c) => {
 });
 
 //POST
+//POST
 data.post("/", async (c) => {
-    const body = await c.req.json().catch(()=>null);
+    const body = await c.req.json().catch(() => null);
 
-    if(!body?.stats) {
+    if (!body?.stats) {
         return c.json(
             errorResponse([
-                {type: "missing required fields", fields: ["stats"]}
+                { type: "missing required fields", fields: ["stats"] }
             ]),
             400
         );
@@ -131,30 +142,96 @@ data.post("/", async (c) => {
 
     const s = body.stats;
 
+    // Validate base fields
     const errors = collectErrors(
         validateRequired(s, ["name", "playCost"]),
         validatePositiveNumber("playCost", s.playCost)
     );
 
-    if(errors.length > 0) {
+    // Validate nested lists if provided
+    if (s.effects !== undefined) {
+        const effCheck = validateEffectsArray(s.effects);
+        if (effCheck) errors.push(effCheck);
+    }
+
+    if (s.traits !== undefined) {
+        const traitCheck = validateStringArray("traits", s.traits);
+        if (traitCheck) errors.push(traitCheck);
+    }
+
+    if (s.keywords !== undefined) {
+        const keyCheck = validateStringArray("keywords", s.keywords);
+        if (keyCheck) errors.push(keyCheck);
+    }
+
+    if (s.restrictions !== undefined) {
+        const restCheck = validateStringArray("restrictions", s.restrictions);
+        if (restCheck) errors.push(restCheck);
+    }
+
+    if (s.soulEffects !== undefined && !Array.isArray(s.soulEffects)) {
+        errors.push({
+            type: "Invalid Value",
+            fields: [
+                {
+                    field: "soulEffects",
+                    value: JSON.stringify(s.soulEffects),
+                    reason: "must be an array"
+                }
+            ]
+        });
+    }
+
+    if (errors.length > 0) {
         return c.json(errorResponse(errors), 400);
     }
 
-    //add new beast
-    db.query<unknown, [string, number, number, number, number, string]>(`
+    // Insert base beast
+    const result = db.query<
+        unknown,
+        [string, number, number, number, number, string]
+    >(`
         INSERT INTO beasts (name, play_cost, level, bts, evo_cost, evo_color)
-        VALUES (?, ?, ?, ?, ?, ?)    
+        VALUES (?, ?, ?, ?, ?, ?)
     `).run(
-    s.name,
-    s.playCost,
-    s.level ?? 0,
-    s.BTS ?? 0,
-    s.evoCost ?? 0,
-    s.evoColor ?? "colorless"
+        s.name,
+        s.playCost,
+        s.level ?? 0,
+        s.BTS ?? 0,
+        s.evoCost ?? 0,
+        s.evoColor ?? "colorless"
     );
+
+    const beastId = result.lastInsertRowid as number;
+
+    // Insert nested lists
+    if (s.effects) {
+        replaceEffects("beast", beastId, s.effects);
+    }
+
+    if (s.traits) {
+        replaceList("beast_traits", "beast_id", beastId, s.traits, "trait");
+    }
+
+    if (s.keywords) {
+        replaceList("beast_keywords", "beast_id", beastId, s.keywords, "keyword");
+    }
+
+    if (s.restrictions) {
+        replaceRestrictions(beastId, s.restrictions);
+    }
+
+    if (s.soulEffects) {
+        replaceSoulEffects(beastId, s.soulEffects);
+    }
+
+    if (s.special) {
+        replaceSpecial(beastId, s.special);
+    }
 
     return c.json(successResponse("Successfully added new Beast"), 201);
 });
+
 
 //PATCH
 data.patch("/:id", async (c) => {
