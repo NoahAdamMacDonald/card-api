@@ -36,6 +36,24 @@ data.get("/:id", (c) => {
         FROM beast_effect_triggers 
         WHERE effect_id IN (SELECT id FROM beast_effects WHERE beast_id = ?) 
     `).all(id);
+
+    //special
+    const special = db
+    .query(`SELECT name, text FROM beast_special WHERE beast_id = ?`).get(id);
+
+    //soul effects
+    const soulEffects = db
+    .query(`
+        SELECT trigger, available, text
+        FROM beast_soul_effects
+        WHERE beast_id = ?
+    `).all(id);
+
+    //traits
+    const traits =db
+    .query(`SELECT trait from beast_traits WHERE beast_id = ?`)
+    .all(id)
+    .map((t: any) => t.trait);
 });
 
 //POST
