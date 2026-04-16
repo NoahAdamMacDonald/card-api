@@ -1,0 +1,38 @@
+export const biomeSchema = `
+CREATE TABLE IF NOT EXISTS biomes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  play_cost INTEGER NOT NULL CHECK (play_cost > 0),
+  color TEXT NOT NULL,
+  bit_effect TEXT
+);
+
+CREATE TABLE IF NOT EXISTS biome_effects (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  biome_id INTEGER NOT NULL,
+  text TEXT NOT NULL,
+  FOREIGN KEY (biome_id) REFERENCES biomes(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS biome_effect_triggers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  effect_id INTEGER NOT NULL,
+  trigger TEXT NOT NULL,
+  available TEXT,
+  FOREIGN KEY (effect_id) REFERENCES biome_effects(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS biome_traits (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  biome_id INTEGER NOT NULL,
+  trait TEXT NOT NULL,
+  FOREIGN KEY (biome_id) REFERENCES biomes(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS biome_keywords (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  biome_id INTEGER NOT NULL,
+  keyword TEXT NOT NULL,
+  FOREIGN KEY (biome_id) REFERENCES biomes(id) ON DELETE CASCADE
+);
+`;
