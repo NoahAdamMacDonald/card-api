@@ -3,4 +3,16 @@ import { db } from "../db";
 
 const data = new Hono();
 
+//GET
+data.get("/", (c)=> {
+    const rows = db
+    .query(`
+        SELECT id, name
+        FROM beasts
+        ORDER BY id
+    `).all();
+
+    return c.json(rows);
+});
+
 export default data;
