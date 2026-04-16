@@ -48,3 +48,48 @@ export function replaceEffects(
         }
     }
 }
+
+export function replaceKeywords(
+    table: string,
+    idField: string,
+    id: number,
+    keywords: string[]
+) {
+    replaceList(table, idField, id, keywords, "keyword");
+}
+
+export function replaceRestrictions(
+    id: number,
+    restrictions: string[]
+) {
+    replaceList("beast_restrictions", "beast_id", id, restrictions, "restriction");
+}
+
+export function replaceSoulEffects(
+    id: number,
+    soulEffects: { trigger: string; available: string | null; text: string }[]
+) {
+    db.query(`DELETE FROM beast_soul_effects WHERE beast_id = ?`).run(id);
+
+    for (const s of soulEffects) {
+        db.query(`
+            INSERT INTO beast_soul_effects (beast_id, trigger, available, text)
+            VALUES (?, ?, ?, ?)
+        `).run(id, s.trigger, s.available ?? null, s.text);
+    }
+}
+
+export function replaceSpecial(
+    id: number,
+    special: { name: string; text: string } | null
+) {
+    db.query(`DELETE FROM beast_special WHERE beast_id = ?`).run(id);
+
+    if (special) {
+        db.query(`
+            INSERT INTO beast_special (beast_id, name, text)
+            VALUES (?, ?, ?)
+        `).run(id, special.name, special.text);
+    }
+}
+
