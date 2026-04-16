@@ -15,4 +15,10 @@ data.get("/", (c)=> {
     return c.json(rows);
 });
 
+//POST
+
+//PATCH
+
+//DELETE
+
 export default data;

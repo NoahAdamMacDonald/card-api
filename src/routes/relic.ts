@@ -3,6 +3,7 @@ import { db } from "../db";
 
 const data = new Hono();
 
+//GET
 data.get("/", (c)=> {
     const rows = db
     .query(`
@@ -13,5 +14,11 @@ data.get("/", (c)=> {
 
     return c.json(rows);
 });
+
+//POST
+
+//PATCH
+
+//DELETE
 
 export default data;
