@@ -1,0 +1,62 @@
+export const beastSchema = `
+CREATE TABLE IF NOT EXISTS beasts (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  name TEXT NOT NULL,
+  play_cost INTEGER NOT NULL CHECK (play_cost > 0),
+  level INTEGER NOT NULL CHECK (level >= 0),
+  bts INTEGER NOT NULL CHECK (bts >= 0),
+  evo_cost INTEGER NOT NULL CHECK (evo_cost >= 0),
+  evo_color TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS beast_effects (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  beast_id INTEGER NOT NULL,
+  text TEXT NOT NULL,
+  FOREIGN KEY (beast_id) REFERENCES beasts(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS beast_effect_triggers (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  effect_id INTEGER NOT NULL,
+  trigger TEXT NOT NULL,
+  FOREIGN KEY (effect_id) REFERENCES beast_effects(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS beast_special (
+  beast_id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  text TEXT NOT NULL,
+  FOREIGN KEY (beast_id) REFERENCES beasts(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS beast_soul_effects (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  beast_id INTEGER NOT NULL,
+  trigger TEXT NOT NULL,
+  available TEXT,
+  text TEXT NOT NULL,
+  FOREIGN KEY (beast_id) REFERENCES beasts(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS beast_traits (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  beast_id INTEGER NOT NULL,
+  trait TEXT NOT NULL,
+  FOREIGN KEY (beast_id) REFERENCES beasts(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS beast_restrictions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  beast_id INTEGER NOT NULL,
+  restriction TEXT NOT NULL,
+  FOREIGN KEY (beast_id) REFERENCES beasts(id) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS beast_keywords (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  beast_id INTEGER NOT NULL,
+  keyword TEXT NOT NULL,
+  FOREIGN KEY (beast_id) REFERENCES beasts(id) ON DELETE CASCADE
+);
+`;
