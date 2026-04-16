@@ -54,3 +54,26 @@ export function validatePositiveNumber(field: string, value: any) {
 export function collectErrors(...validators: (any | null)[]) {
     return validators.filter((v) => v !== null);
 }
+
+export function applyStringUpdate(
+    field: string, 
+    value: any, 
+    options: {
+        sqlField: string;
+        parent?: string;
+        updates: string[];
+        params: any[];
+        updatedFields: string[];
+    }
+) {
+    if(value===undefined) return;
+
+    options.updates.push(`${options.sqlField} = ?`);
+    options.params.push(value);
+
+    const fullField = options.parent ? `${options.parent}.${field}` : field;
+
+    options.updatedFields.push(fullField);
+}
+
+
