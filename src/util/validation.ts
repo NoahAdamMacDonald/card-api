@@ -81,6 +81,51 @@ export function validatePositiveNumber(field: string, value: any) {
     };
 }
 
+export function validateEffectsArray(value: any) {
+    if (!Array.isArray(value)) {
+        return {
+        type: "Invalid Value",
+        fields: [
+            {
+            field: "effects",
+            value: JSON.stringify(value),
+            reason: "must be an array"
+            }
+        ]
+        };
+    }
+
+    for (const effect of value) {
+        if (typeof effect.text !== "string") {
+        return {
+            type: "Invalid Value",
+            fields: [
+            {
+                field: "effects.text",
+                value: JSON.stringify(effect.text),
+                reason: "must be a string"
+            }
+            ]
+        };
+        }
+
+        if (!Array.isArray(effect.trigger)) {
+        return {
+            type: "Invalid Value",
+            fields: [
+            {
+                field: "effects.trigger",
+                value: JSON.stringify(effect.trigger),
+                reason: "must be an array of strings"
+            }
+            ]
+        };
+        }
+    }
+  return null;
+}
+
+
 //Helper functions
 export function collectErrors(...validators: (any | null)[]) {
     return validators.filter((v) => v !== null);
