@@ -1,12 +1,14 @@
 import { Hono } from "hono";
 import { db } from "../db";
 
+import * as beastTypes from "../types/beast";
+
 const data = new Hono();
 
 //GET
 data.get("/", (c)=> {
     const rows = db
-    .query(`
+    .query<Pick<beastTypes.BeastRow, "id" | "name">, []>(`
         SELECT id, name
         FROM beasts
         ORDER BY id
