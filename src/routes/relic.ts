@@ -16,11 +16,7 @@ import {
 
 import { 
     replaceEffects,
-    replaceKeywords,
-    replaceList,
-    replaceRestrictions,
-    replaceSoulEffects,
-    replaceSpecial
+    replaceKeywords
 } from "../util/dbHelpers";
 
 const data = new Hono();
