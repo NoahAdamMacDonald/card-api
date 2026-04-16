@@ -7,7 +7,9 @@ import {
     errorResponse,
     collectErrors,
     validatePositiveNumber,
-    validateRequired 
+    validateRequired,
+    applyNumberUpdate,
+    applyStringUpdate 
 } from "../util/validation";
 
 const data = new Hono();
@@ -124,6 +126,93 @@ data.post("/", async (c) => {
 });
 
 //PATCH
+data.patch("/:id", async (c) => {
+    const id = Number(c.req.param("id"));
+    const body = await c.req.json().catch(() => null);
+
+    const exists = db.query<{id: number}, [number]>(`
+        SELECT id FROM programs WHERE id = ?
+    `)
+    .get(id);
+
+    if(!exists) {
+        return c.json(
+            {error: "Program not found", success: false},
+            404
+        );
+    }
+
+    if (!body?.stats) {
+        return c.json(
+            errorResponse([{ type: "missing required fields", fields: ["stats"] }]),
+            400
+        );
+    }
+
+    const s = body.stats;
+
+    const updates: string[] = [];
+    const params: any[] = [];
+    const updatedFields: string[] = [];
+    const errors: any[] = [];
+
+    //Apply updates
+    applyStringUpdate("name", s.name, {
+        sqlField: "name",
+        parent: "stats",
+        updates,
+        params,
+        updatedFields
+    });
+
+    applyNumberUpdate("playCost", s.playCost, {
+        sqlField: "play_cost",
+        parent: "stats",
+        updates,
+        params,
+        updatedFields,
+        errors
+    });
+
+    applyStringUpdate("color", s.color, {
+        sqlField: "color",
+        parent: "stats",
+        updates,
+        params,
+        updatedFields
+    });
+
+    applyStringUpdate("bitEffect", s.bitEffect, {
+        sqlField: "bit_effect",
+        parent: "stats",
+        updates,
+        params,
+        updatedFields
+    });
+
+    if (errors.length > 0) {
+        return c.json(errorResponse(errors), 400);
+    }
+
+    if (updates.length === 0) {
+        return c.json(
+        errorResponse([
+            { type: "Invalid Value", fields: ["No valid fields provided"] }]), 400
+        );
+    }
+
+    //Send update
+    params.push(id);
+    db.query<unknown, any[]>(`
+    UPDATE programs SET ${updates.join(", ")} WHERE id = ?
+    `).run(...params);
+
+    return c.json({
+        message: "Successfully updated Program",
+        updatedFields,
+        success: true
+    });
+});
 
 //DELETE
 data.delete("/:id", (c) => {
