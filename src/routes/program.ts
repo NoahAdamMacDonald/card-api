@@ -61,6 +61,15 @@ data.get("/:id", (c) => {
     .all(id)
     .map((k: any) => k.keyword);
 
+    //connect effects and triggers
+    const effectsWithTriggers = effects.map((effect) => ({
+    trigger: triggers
+        .filter((t) => t.effect_id === effect.id)
+        .map((t) => t.trigger),
+    available: triggers.find((t) => t.effect_id === effect.id)?.available ?? null,
+    text: effect.text,
+    }));
+
 
 });
 
