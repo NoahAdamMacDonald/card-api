@@ -34,10 +34,16 @@ data.get("/:id", (c) => {
     //effects
     const effect = db
     .query<relicTypes.RelicEffectRow, [number]>(`
+        SELECT id, text FROM relic_effects WHERE relic_id = ?
+    `).all(id);
+
+    //triggers
+    const triggers = db
+    .query<relicTypes.RelicTriggerRow, [number]>(`
         SELECT effect_id, trigger, available
         FROM relic_effect_triggers
-        WHERE effect_id IN (SELECT id FROM relic_effects WHERE relic_id = ?)    
-    `).all(id);
+        WHERE effect_id IN (SELECT id FROM relic_effects WHERE relic_id = ?)  
+    `)
 });
 
 //POST
