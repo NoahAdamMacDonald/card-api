@@ -24,7 +24,18 @@ data.get("/:id", (c) => {
         SELECT id, name, play_cost, level, bts, evo_cost, evo_color
         FROM beasts where id = ?
     `).get(id);
+    
+    //effects
+    const effects = db
+    .query(`SELECT id, text FROM beast_effects WHERE beast_id = ?`).all(id);
 
+    //effects triggers
+    const triggers = db
+    .query(`
+        SELECT effect_id, trigger 
+        FROM beast_effect_triggers 
+        WHERE effect_id IN (SELECT id FROM beast_effects WHERE beast_id = ?) 
+    `).all(id);
 });
 
 //POST
