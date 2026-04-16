@@ -171,7 +171,7 @@ data.delete("/:id", (c) => {
         );
     }
 
-    //Delete beast
+    //Delete
     db.query<unknown, [number]>(
         `DELETE FROM beasts WHERE id = ?`
     ).run(id);
