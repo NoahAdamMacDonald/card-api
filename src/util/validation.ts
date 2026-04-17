@@ -255,7 +255,14 @@ export function validateObjectShape(
 		: null;
 }
 
-
+export function validateNullableObjectShape(
+	field: string,
+	value: any,
+	shape: Record<string, (value: any) => any>,
+) {
+	if (value === null) return null;
+	return validateObjectShape(field, value, shape);
+}
 
 export function validateArrayOfObjects(
 	field: string,
