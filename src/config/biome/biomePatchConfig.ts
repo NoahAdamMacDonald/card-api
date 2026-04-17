@@ -1,9 +1,10 @@
 import {
 	applyStringUpdate,
 	applyNumberUpdate,
-	validateEffectsArray,
-	validateStringArray,
+	validateSchema,
 } from "../../util/validation";
+
+import { biomeSchema } from "./biomeSchema";
 
 import {
 	replaceEffects,
@@ -24,18 +25,7 @@ export const biomePatchConfig = {
 	],
 
 	validateNested(s: any, errors: any[]) {
-		if (s.effects !== undefined) {
-			const e = validateEffectsArray(s.effects);
-			if (e) errors.push(e);
-		}
-		if (s.traits !== undefined) {
-			const t = validateStringArray("traits", s.traits);
-			if (t) errors.push(t);
-		}
-		if (s.keywords !== undefined) {
-			const k = validateStringArray("keywords", s.keywords);
-			if (k) errors.push(k);
-		}
+		validateSchema(biomeSchema, s, errors);
 	},
 
 	nested: [
