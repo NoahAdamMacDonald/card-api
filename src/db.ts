@@ -5,6 +5,13 @@ import { biomeSchema } from "./schema/biome";
 import { programSchema } from "./schema/program";
 import { relicSchema } from "./schema/relic";
 
+import { existsSync, mkdirSync } from "node:fs";
+
+//create data folder
+if (!existsSync("./data")) {
+	mkdirSync("./data", { recursive: true });
+}
+
 export const db = new Database("./data/database.sqlite");
 
 db.run(`PRAGMA foreign_keys = ON;`);
