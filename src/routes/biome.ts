@@ -5,10 +5,12 @@ import * as biomeTypes from "../types/biome";
 //endpoint imports
 import { createCard } from "../util/createCard";
 import { getCardbyId } from "../util/getCardbyId";
+import { deleteCard } from "../util/deleteCard";
 
 //config
 import { biomePostConfig } from "../config/biome/biomePostConfig";
 import { biomeGetConfig } from "../config/biome/biomeGetConfig";
+import { biomeDeleteConfig } from "../config/biome/biomeDeleteConfig";
 
 import {
 	successResponse,
@@ -141,20 +143,7 @@ data.patch("/:id", async (c) => {
 });
 
 //DELETE
-data.delete("/:id", (c) => {
-	const id = Number(c.req.param("id"));
-
-	const exists = checkBiomeExist(c, id);
-	if (!exists) return exists;
-
-	//Delete
-	db.query<unknown, [number]>(`DELETE FROM biomes WHERE id = ?`).run(id);
-
-	return c.json({
-		message: "Successfully deleted Biome",
-		success: true,
-	});
-});
+data.delete("/:id", (c) => deleteCard(c, biomeDeleteConfig));
 
 //Helper
 function checkBiomeExist(c: any, id: number) {
