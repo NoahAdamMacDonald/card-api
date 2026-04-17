@@ -2,7 +2,7 @@ export const beastSchema = `
 CREATE TABLE IF NOT EXISTS beasts (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
-  play_cost INTEGER NOT NULL CHECK (play_cost > 0),
+  play_cost INTEGER NOT NULL CHECK (play_cost >= 0),
   level INTEGER NOT NULL CHECK (level >= 0),
   bts INTEGER NOT NULL CHECK (bts >= 0),
   evo_cost INTEGER NOT NULL CHECK (evo_cost >= 0),
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS beast_effect_triggers (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   effect_id INTEGER NOT NULL,
   trigger TEXT NOT NULL,
-  available TEXT, 
+  available TEXT,
   FOREIGN KEY (effect_id) REFERENCES beast_effects(id) ON DELETE CASCADE
 );
 
