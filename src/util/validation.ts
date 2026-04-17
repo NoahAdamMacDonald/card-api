@@ -13,6 +13,34 @@ export function successResponse(message: string) {
 }
 
 
+export function validatePositiveNumber(field: string, value: any) {
+    if (typeof value !== "number") {
+        return {
+            type: "Invalid Value",
+            fields: [
+                {
+                field,
+                value: JSON.stringify(value),
+                reason: "must be a number",
+                },
+            ],
+        };
+    }
+    if (value < 0) {
+        return {
+            type: "Invalid Value",
+            fields: [
+                {
+                field,
+                value,
+                reason: "must be a positive number",
+                },
+            ],
+        }
+    }
+    return null
+}
+
 //Validation Checkers
 
 
