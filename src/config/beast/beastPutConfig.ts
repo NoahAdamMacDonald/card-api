@@ -8,6 +8,9 @@ import {
 	replaceEffects,
 	replaceList,
 	replaceKeywords,
+    replaceSoulEffects,
+    replaceSpecial,
+    replaceRestrictions
 } from "../../util/dbHelpers";
 
 export const beastPutConfig = {
@@ -78,24 +81,15 @@ export const beastPutConfig = {
 		},
 		{
 			field: "restrictions",
-			handler: (id: number, v: any) =>
-				replaceList(
-					"beast_restrictions",
-					"beast_id",
-					id,
-					v,
-					"restriction",
-				),
+			handler: (id: number, v: any) => replaceRestrictions(id, v),
 		},
 		{
 			field: "soulEffects",
-			handler: (id: number, v: any) =>
-				replaceList("beast_soul_effects", "beast_id", id, v, "text"),
+			handler: (id: number, v: any) => replaceSoulEffects(id, v),
 		},
 		{
 			field: "special",
-			handler: (id: number, v: any) =>
-				replaceList("beast_special", "beast_id", id, [v], "text"),
+			handler: (id: number, v: any) => replaceSpecial(id, v),
 		},
 	],
 };
