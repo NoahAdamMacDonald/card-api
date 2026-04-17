@@ -36,7 +36,7 @@ export async function createCard(c: any, config: any) {
     }
 
     if(errors.length > 0) {
-        return c.json(errorResponse(errors), 400);
+        return c.json(errorResponse(collectErrors(...errors)), 400);
     }
 
     //insert base row
