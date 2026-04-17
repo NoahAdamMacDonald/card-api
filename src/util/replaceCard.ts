@@ -2,6 +2,31 @@ import { db } from "../db";
 import { checkExists } from "./checkExists";
 import { successResponse, errorResponse, collectErrors } from "./validation";
 
+/**
+ * Replaces a card in the database with the provided request body and configuration.
+ * 
+ * @param {any} c - The request context
+ * @param {any} config - The configuration object
+ * 
+ * The configuration object should contain the following properties:
+ * - table: the name of the table to replace the card in
+ * - notFoundMessage: the error message to return if the card is not found
+ * - required: an array of required fields in the request body.stats object
+ * - validate: an optional function that takes the request body.stats object and an array of errors as arguments
+ * - validateNested: an optional function that takes the request body.stats object and an array of errors as arguments
+ * - replace: an object containing the SQL query to replace the base row and an array of parameters to insert
+ * - nested: an array of objects containing the following properties:
+ *   - field: the name of the field in the request body.stats object that contains the nested list
+ *   - sql: the SQL query to replace the nested list
+ *   - handler: a function that takes the id of the newly replaced base row and the nested list as arguments
+ * - successMessage: an optional string that will be returned in the response if the card is successfully replaced
+ * 
+ * If the card is not found, a 404 response will be returned with the notFoundMessage.
+ * 
+ * If the request body is invalid or if any of the required fields are missing, a 400 response will be returned with an error message.
+ * 
+ * If the card is successfully replaced, a 200 response will be returned with the success message.
+ */
 export async function replaceCard(c: any, config: any) {
     const id = Number(c.req.param("id"));
     const body = await c.req.json().catch(() => null);
@@ -56,5 +81,4 @@ export async function replaceCard(c: any, config: any) {
     }
 
     return c.json(successResponse(config.successMessage));
-
 }

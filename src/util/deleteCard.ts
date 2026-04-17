@@ -3,6 +3,12 @@ import { checkExists } from "./checkExists";
 
 import { successResponse } from "./validation";
 
+/**
+ * Deletes a card from the database with the given id.
+ * @param {any} c - The request context
+ * @param {any} config - The configuration object
+ * @returns {Response} A JSON response with a success message
+ */
 export function deleteCard(c: any, config: any) {
     const id = Number(c.req.param("id"));
 
