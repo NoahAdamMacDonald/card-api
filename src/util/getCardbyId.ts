@@ -5,7 +5,7 @@ export function getCardbyId(c: any, config: any) {
     const id = Number(c.req.param("id"));
 
     const exists = checkExists(c, config.table, id, config.notFoundMessage);
-    if (!exists) return exists;
+    if (!exists || exists instanceof Response) return exists;
 
     //base row
     const base = db.query(config.base.sql).get(id);
