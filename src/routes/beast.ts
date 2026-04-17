@@ -19,35 +19,49 @@ const data = new Hono();
 
 //GET
 data.get("/", (c) => {
-	//filters
+	//Filters
 	const page = Number(c.req.query("page") ?? 1);
 	const limit = Number(c.req.query("limit") ?? 20);
 	const name = c.req.query("name") ?? null;
-	const minLevel = Number(c.req.query("minLevel") ?? null);
-	const maxLevel = Number(c.req.query("maxLevel") ?? null);
 	const evoColor = c.req.query("evoColor") ?? null;
-
+	const minLevel =
+		c.req.query("minLevel") !== undefined
+			? Number(c.req.query("minLevel"))
+			: null;
+	const maxLevel =
+		c.req.query("maxLevel") !== undefined
+			? Number(c.req.query("maxLevel"))
+			: null;
+	const minId =
+		c.req.query("minId") !== undefined ? Number(c.req.query("minId")) : null;
+	const maxId =
+		c.req.query("maxId") !== undefined ? Number(c.req.query("maxId")) : null;
+	const order = c.req.query("order")?.toUpperCase() === "DESC" ? "DESC" : "ASC";
+	
 	const offset = (page - 1) * limit;
-
-    const rows = db
+	
+	const rows = db
 	.query(`
-		SELECT id, name
+      	SELECT id, name
 		FROM beasts
 		WHERE (?1 IS NULL OR name LIKE '%' || ?1 || '%')
 		AND (?2 IS NULL OR level >= ?2)
 		AND (?3 IS NULL OR level <= ?3)
 		AND (?4 IS NULL OR evo_color = ?4)
-		ORDER BY id
-		LIMIT ?5 OFFSET ?6
-    `,).all(name, minLevel, maxLevel, evoColor, limit, offset);
+		AND (?5 IS NULL OR id >= ?5)
+		AND (?6 IS NULL OR id <= ?6)
+		ORDER BY id ${order}
+		LIMIT ?7 OFFSET ?8
+    `).all(name, minLevel, maxLevel, evoColor, minId, maxId, limit, offset);
 
-    return c.json({
+	return c.json({
 		page,
 		limit,
 		count: rows.length,
 		results: rows,
 	});
 });
+
 
 data.get("/:id", (c) => getCardbyId(c, beastGetConfig));
 
