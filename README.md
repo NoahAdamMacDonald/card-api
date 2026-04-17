@@ -9,7 +9,19 @@ Built using **BUN ** + **Hono**+ **SQLite**
 _Adam Johnston_ - _Matthew Hatcher_ - _Noah MacDonald_ - _Silas Mahoney_
 
 ## Navigation
-
+- [Project Overview](#project-overview)
+- [API Concept & Resources](#api-concept-resources)
+- [Database Design](#database-design)
+    - [beast](#beast)
+    - [biome](#biome)
+    - [program](#program)
+    - [relic](#relic)
+- [Set up and installation](#set-up-installation-for-local-use)
+- [API Endpoints](#api-endpoints)
+    - [Create](#create)
+    - [Read](#read)
+    - [Update](#update)
+    - [Delete](#delete)
 
 ## Project Overview
 This project is a full REST API built that exposes
@@ -377,6 +389,302 @@ Required for all are `stats` where all other fields are put under
   }
 }
 ```
+
+### READ
+All endpoints support `GET` to retrieve an array of all cards of its type and a `GET/:id`
+
+#### GET
+Returns an array of all cards of its type
+**GET** `/api/<type>?[param=value]`
+
+All endpoints supports parameters
+- page : limits page
+- limit : limits number of results
+- name : filters by name
+- minId : filters by minimum id
+- maxId : filters by maximum id
+- order : change order by id from ASC or DESC
+
+beast supports
+- evoColor : filters id to only with matching evoColor
+- minLevel : filters by minimum level
+- maxLevel : filters by maximum level
+
+biome, program and relic support
+- color : filters by color
+
+`/api/beast`
+
+```json
+{
+  "page": 1,
+  "limit": 20,
+  "count": 10,
+  "results": [
+    {
+      "id": 1,
+      "name": "5"
+    },
+    {
+      "id": 2,
+      "name": "test"
+    },
+    {
+      "id": 3,
+      "name": "test"
+    },
+    {
+      "id": 4,
+      "name": "abc"
+    },
+    {
+      "id": 5,
+      "name": "Cyber Wolf"
+    },
+    {
+      "id": 6,
+      "name": "Cyber Wolf"
+    },
+    {
+      "id": 7,
+      "name": "Cyber Wolf"
+    },
+    {
+      "id": 8,
+      "name": "Bad Beast"
+    },
+    {
+      "id": 9,
+      "name": "abc"
+    },
+    {
+      "id": 10,
+      "name": "Cyber Wolf"
+    }
+  ]
+}
+```
+
+`/api/beast?limit=3&evoColor=blue&order=desc`
+```json
+{
+  "page": 1,
+  "limit": 3,
+  "count": 3,
+  "results": [
+    {
+      "id": 10,
+      "name": "Cyber Wolf"
+    },
+    {
+      "id": 9,
+      "name": "abc"
+    },
+    {
+      "id": 2,
+      "name": "test"
+    }
+  ]
+}
+```
+
+#### GET/:id
+Returns all details for a single card with an optional fields parameter to limit results
+**GET** `/api/<type>/:id?fields=<field>,<field>`
+
+Fields: if applied, stats only returns fields listed.
+
+`/api/10`
+
+```json
+{
+  "id": 10,
+  "cardType": "beast",
+  "stats": {
+    "name": "Cyber Wolf",
+    "playCost": 5,
+    "level": 2,
+    "BTS": 3,
+    "evoCost": 4,
+    "evoColor": "blue",
+    "effects": [
+      {
+        "trigger": [
+          "On Play"
+        ],
+        "text": "Gain +2 BTS this turn."
+      },
+      {
+        "trigger": [
+          "All Turns"
+        ],
+        "text": "Draw 1 card."
+      }
+    ],
+    "special": {
+      "name": "Overclock",
+      "text": "This beast gains +1 level while attacking."
+    },
+    "soulEffects": [
+      {
+        "trigger": "On Delete",
+        "available": "Always",
+        "text": "Draw 2 cards."
+      },
+      {
+        "trigger": "On Play",
+        "available": "Turn Start",
+        "text": "Gain 1 energy."
+      }
+    ],
+    "restrictions": [
+      "Cannot attack this turn"
+    ],
+    "traits": [
+      "Beast",
+      "Cyber"
+    ],
+    "keywords": [
+      "Fast",
+      "Hunter"
+    ]
+  }
+}
+```
+
+`/api/beast/10?fields=name,level,effects`
+
+```json
+{
+  "id": 10,
+  "cardType": "beast",
+  "stats": {
+    "name": "Cyber Wolf",
+    "level": 2,
+    "effects": [
+      {
+        "trigger": [
+          "On Play"
+        ],
+        "text": "Gain +2 BTS this turn."
+      },
+      {
+        "trigger": [
+          "All Turns"
+        ],
+        "text": "Draw 1 card."
+      }
+    ]
+  }
+}
+```
+
+### Update
+all endpoints support **PATCH** to update individual fields and **PUT** to replace entire object.
+
+**PATCH** `/api/<type>/:id`
+
+```json
+{
+    "stats": {
+        "name": "new name"
+    }
+}
+```
+
+Success
+```json
+{
+    "message": "Successfully updated Beast",
+    "success": true,
+    "updatedFields": [
+        "stats.name"
+    ]
+}
+```
+
+Fail
+```json
+{
+    "errors": [
+        {
+            "type": "Invalid Value",
+            "fields": [
+                {
+                    "field": "name",
+                    "value": "1",
+                    "reason": "must be a string"
+                }
+            ]
+        }
+    ],
+    "success": false
+}
+```
+
+- - - -
+
+**PUT** `/api/<type>/:id`
+
+```json
+{
+    "stats": {
+        "name": "replaced card",
+        "playCost": 5,
+        "level": 1,
+        "bts": 1,
+        "evoCost": 10,
+        "evoColor": "green"
+    }
+}
+```
+
+Success
+```
+{
+    "message": "Successfully replaced Beast",
+    "success": true
+}
+```
+
+Fail
+```json
+{
+    "errors": [
+        {
+            "type": "missing required fields",
+            "fields": [
+                "bts",
+                "evoCost"
+            ]
+        }
+    ],
+    "success": false
+}
+```
+
+### DELETE
+all endpoints support **DELETE** cards.
+
+**DELETE** `/api/<type>/:id`
+
+Success
+```json
+{
+  "message": "Successfully deleted Beast",
+  "success": true
+}
+```
+
+Fail
+```json
+{
+  "error": "Beast not found",
+  "success": false
+}
+```
+
+
 
 
 
