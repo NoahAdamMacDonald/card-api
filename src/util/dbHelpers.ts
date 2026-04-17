@@ -1,6 +1,17 @@
 import { db } from "../db";
 
 //Replace existing list with new one
+
+
+/**
+ * Replace all existing values in a list with new ones.
+ *
+ * @param {string} table - The table to replace values in.
+ * @param {string} idField - The field in the table that corresponds to the id.
+ * @param {number} id - The id of the row to replace values in.
+ * @param {string[]} values - The new values to insert into the table.
+ * @param {string} valueField - The field in the table that corresponds to the values.
+ */
 export function replaceList(
     table: string,
     idField: string,
@@ -16,6 +27,13 @@ export function replaceList(
     }
 }
 
+/**
+ * Replace all existing effects in a beast/relic/program/biome with new ones.
+ *
+ * @param {string} type - The type of the effects to replace.
+ * @param {number} id - The id of the beast/relic/program/biome to replace effects in.
+ * @param {Object[]} effects - An array of objects containing the text, trigger, and available fields of the effects.
+ */
 export function replaceEffects(
     type: "beast" | "relic" | "program" | "biome",
     id: number,
@@ -49,6 +67,14 @@ export function replaceEffects(
     }
 }
 
+/**
+ * Replace all existing keywords in a table with new ones.
+ *
+ * @param {string} table - The table to replace keywords in.
+ * @param {string} idField - The field in the table that corresponds to the id.
+ * @param {number} id - The id of the row to replace keywords in.
+ * @param {string[]} keywords - The new keywords to insert into the table.
+ */
 export function replaceKeywords(
     table: string,
     idField: string,
@@ -58,6 +84,12 @@ export function replaceKeywords(
     replaceList(table, idField, id, keywords, "keyword");
 }
 
+/**
+ * Replace all existing restrictions in a beast with new ones.
+ *
+ * @param {number} id - The id of the beast to replace restrictions in.
+ * @param {string[]} restrictions - The new restrictions to insert into the beast.
+ */
 export function replaceRestrictions(
     id: number,
     restrictions: string[]
@@ -65,6 +97,16 @@ export function replaceRestrictions(
     replaceList("beast_restrictions", "beast_id", id, restrictions, "restriction");
 }
 
+/**
+ * Replace all existing soul effects in a beast with new ones.
+ *
+ * @param {number} id - The id of the beast to replace soul effects in.
+ * @param {Object[]} soulEffects - The new soul effects to insert into the beast.
+ * Each object should have the following properties:
+ * - trigger: string - The trigger of the effect.
+ * - available: string | null - The available status of the effect.
+ * - text: string - The text of the effect.
+ */
 export function replaceSoulEffects(
     id: number,
     soulEffects: { trigger: string; available: string | null; text: string }[]
@@ -79,6 +121,16 @@ export function replaceSoulEffects(
     }
 }
 
+/**
+ * Replace the special ability of a beast with a new one.
+ *
+ * @param {number} id - The id of the beast to replace the special ability of.
+ * @param {Object | null} special - The new special ability to insert into the beast.
+ * If null, the existing special ability will be deleted.
+ * The object should contain the following properties:
+ * - name: string - The name of the special ability.
+ * - text: string - The text of the special ability.
+ */
 export function replaceSpecial(
     id: number,
     special: { name: string; text: string } | null
