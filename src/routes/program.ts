@@ -6,11 +6,13 @@ import * as programTypes from "../types/program";
 import { createCard } from "../util/createCard";
 import { getCardbyId } from "../util/getCardbyId";
 import { deleteCard } from "../util/deleteCard";
+import { updateCard } from "../util/updateCard";
 
 //config
 import { programPostConfig } from "../config/program/programPostConfig";
 import { programGetConfig } from "../config/program/programGetConfig";
 import { programDeleteConfig } from "../config/program/programDeleteConfig";
+import { programPatchConfig } from "../config/program/programPatchConfig";
 
 
 import {
@@ -50,99 +52,7 @@ data.get("/:id", (c) => getCardbyId(c, programGetConfig));
 data.post("/", (c) => createCard(c, programPostConfig));
 
 //PATCH
-data.patch("/:id", async (c) => {
-	const id = Number(c.req.param("id"));
-	const body = await c.req.json().catch(() => null);
-
-	const exists = checkProgramExist(c, id);
-	if (!exists) return exists;
-
-	if (!body?.stats) {
-		return c.json(
-			errorResponse([
-				{ type: "missing required fields", fields: ["stats"] },
-			]),
-			400,
-		);
-	}
-
-	const s = body.stats;
-
-	const updates: string[] = [];
-	const params: any[] = [];
-	const updatedFields: string[] = [];
-	const errors: any[] = [];
-
-	// Base stat updates
-	applyStringUpdate("name", s.name, {
-		sqlField: "name",
-		parent: "stats",
-		updates,
-		params,
-		updatedFields,
-	});
-
-	applyNumberUpdate("playCost", s.playCost, {
-		sqlField: "play_cost",
-		parent: "stats",
-		updates,
-		params,
-		updatedFields,
-		errors,
-	});
-
-	applyStringUpdate("color", s.color, {
-		sqlField: "color",
-		parent: "stats",
-		updates,
-		params,
-		updatedFields,
-	});
-
-	applyStringUpdate("bitEffect", s.bitEffect, {
-		sqlField: "bit_effect",
-		parent: "stats",
-		updates,
-		params,
-		updatedFields,
-	});
-
-	validateNestedProgramStats(s, errors);
-
-	if (errors.length > 0) {
-		return c.json(errorResponse(errors), 400);
-	}
-
-	if (s.effects !== undefined) {
-		replaceEffects("program", id, s.effects);
-		updatedFields.push("stats.effects");
-	}
-
-	if (s.traits !== undefined) {
-		replaceList("program_traits", "program_id", id, s.traits, "trait");
-		updatedFields.push("stats.traits");
-	}
-
-	if (s.keywords !== undefined) {
-		replaceKeywords("program_keywords", "program_id", id, s.keywords);
-		updatedFields.push("stats.keywords");
-	}
-
-	if (updates.length > 0) {
-		params.push(id);
-		db.query<unknown, any[]>(
-			`
-            UPDATE programs SET ${updates.join(", ")} WHERE id = ?
-        `,
-		).run(...params);
-	}
-
-	return c.json({
-		message: "Successfully updated Program",
-		updatedFields,
-		success: true,
-	});
-});
+data.patch("/:id", (c) => updateCard(c, programPatchConfig));
 
 //DELETE
 data.delete("/:id", (c) => deleteCard(c, programDeleteConfig));
