@@ -3,7 +3,7 @@
 A REST API for managing **Beasts**, **Programs**, **Biomes **and **Relics** for a 
 Deck Building Card Game.
 
-Built using **BUN ** + **Hono**+ **SQLite**
+Built using **BUN** + **Hono**+ **SQLite**
 
 ## Group Members
 _Adam Johnston_ - _Matthew Hatcher_ - _Noah MacDonald_ - _Silas Mahoney_
@@ -640,7 +640,7 @@ Fail
 ```
 
 Success
-```
+```json
 {
     "message": "Successfully replaced Beast",
     "success": true
