@@ -1,5 +1,5 @@
-export const biomeDeleteConfig = {
-	table: "biomes",
-	notFoundMessage: "Biome not found",
-	successMessage: "Successfully deleted Biome",
+export const programDeleteConfig = {
+	table: "programs",
+	notFoundMessage: "Program not found",
+	successMessage: "Successfully deleted Program",
 };
