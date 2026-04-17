@@ -67,17 +67,17 @@ export function validateStringArray(field: string, value: any) {
 
 
 export function validatePositiveNumber(field: string, value: any) {
-	if (typeof value !== "number" || value < 0) {
-		return {
-			type: "Invalid Value",
-			fields: [
-				{
-					field,
-					reason: "must be a number ≥ 0",
-				},
-			],
-		};
-	}
+  if (typeof value !== "number" || value < 0) {
+    return {
+      type: "Invalid Value",
+      fields: [
+        {
+          field,
+          reason: "must be a number ≥ 0"
+        }
+      ]
+    };
+  }
 }
 
 
@@ -128,8 +128,25 @@ export function validateEffectsArray(value: any) {
 
 //Helper functions
 export function collectErrors(...validators: (any | null)[]) {
-    return validators.filter((v) => v !== null);
+	const filtered = validators.filter((v) => v !== null);
+	const grouped: Record<string, any> = {};
+
+	for (const error of filtered) {
+		if (!grouped[error.type]) {
+			grouped[error.type] = { type: error.type, fields: [] };
+		}
+
+		// Merge fields (array or single object)
+		if (Array.isArray(error.fields)) {
+			grouped[error.type].fields.push(...error.fields);
+		} else {
+			grouped[error.type].fields.push(error.fields);
+		}
+	}
+
+	return Object.values(grouped);
 }
+
 
 export function applyStringUpdate(
     field: string, 
