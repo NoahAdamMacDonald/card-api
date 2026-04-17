@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import type { ApplicableRefactorInfo } from "typescript";
+import { serveStatic } from "hono/bun";
 
 //import routes
 import beast from "./routes/beast";
@@ -14,6 +14,12 @@ app.route("/api/beast", beast);
 app.route("/api/relic", relic);
 app.route("/api/program", program);
 app.route("/api/biome", biome);
+
+//redirect to doc page
+app.use("/*", serveStatic({ root: "./public" }));
+app.get("/api/*", c => c.redirect("../index.html"));
+app.get("*", (c) => c.redirect("./index.html"));
+
 
 export default{
     port: 3000,

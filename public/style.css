@@ -1,0 +1,74 @@
+body {
+  font-family: system-ui, sans-serif;
+  background: hsl(0, 0%, 80%);
+  margin: 0;
+  padding: 40px;
+  color: #333;
+}
+
+header {
+  margin-bottom: 40px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 2.4rem;
+}
+
+.subtitle {
+  margin-top: 6px;
+  color: #666;
+}
+
+section {
+  background: white;
+  padding: 20px 24px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+}
+
+h2 {
+  margin-top: 0;
+  color: #444;
+}
+
+ul {
+  list-style: none;
+  padding-left: 0;
+}
+
+li {
+  margin: 6px 0;
+}
+
+code {
+  background: #eee;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 0.95rem;
+}
+
+footer {
+  margin-top: 40px;
+  text-align: center;
+  color: #777;
+  font-size: 0.9rem;
+}
+
+.email {
+  color: #0066cc;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.email:hover {
+  text-decoration: underline;
+}
+
+.group {
+  margin-top: 4px;
+  color: #555;
+  font-size: 0.95rem;
+  font-weight: 500;
+}
