@@ -3,7 +3,7 @@ import { db } from "../db";
 import * as programTypes from "../types/program";
 
 import { createCard } from "../util/createCard";
-import { programConfig } from "../config/programConfig";
+import { programConfig } from "../config/program/programPostConfig";
 
 import { 
     successResponse, 

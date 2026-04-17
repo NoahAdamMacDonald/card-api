@@ -1,18 +1,18 @@
-import { replaceEffects, replaceList, replaceKeywords } from "../util/dbHelpers";
+import { replaceEffects, replaceList, replaceKeywords } from "../../util/dbHelpers";
 
 import {
 	validatePositiveNumber,
 	validateEffectsArray,
 	validateStringArray,
-} from "../util/validation";
+} from "../../util/validation";
 
-export const biomeConfig = {
+export const programConfig = {
 	required: ["name", "playCost", "color", "bitEffect"],
-	successMessage: "Successfully added new Biome",
+	successMessage: "Successfully added new Program",
 
 	insert: {
 		sql: `
-      INSERT INTO biomes (name, play_cost, color, bit_effect)
+      INSERT INTO programs (name, play_cost, color, bit_effect)
       VALUES (?, ?, ?, ?)
     `,
 		params: (s: any) => [s.name, s.playCost, s.color, s.bitEffect],
@@ -41,17 +41,17 @@ export const biomeConfig = {
 	nested: [
 		{
 			field: "effects",
-			handler: (id: number, v: any) => replaceEffects("biome", id, v),
+			handler: (id: number, v: any) => replaceEffects("program", id, v),
 		},
 		{
 			field: "traits",
 			handler: (id: number, v: any) =>
-				replaceList("biome_traits", "biome_id", id, v, "trait"),
+				replaceList("program_traits", "program_id", id, v, "trait"),
 		},
 		{
 			field: "keywords",
 			handler: (id: number, v: any) =>
-				replaceKeywords("biome_keywords", "biome_id", id, v),
+				replaceKeywords("program_keywords", "program_id", id, v),
 		},
 	],
 };

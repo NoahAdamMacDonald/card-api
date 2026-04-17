@@ -1,18 +1,18 @@
-import { replaceEffects, replaceKeywords } from "../util/dbHelpers";
+import { replaceEffects, replaceList, replaceKeywords } from "../../util/dbHelpers";
 
 import {
 	validatePositiveNumber,
 	validateEffectsArray,
 	validateStringArray,
-} from "../util/validation";
+} from "../../util/validation";
 
-export const relicConfig = {
+export const biomeConfig = {
 	required: ["name", "playCost", "color", "bitEffect"],
-	successMessage: "Successfully added new Relic",
+	successMessage: "Successfully added new Biome",
 
 	insert: {
 		sql: `
-      INSERT INTO relics (name, play_cost, color, bit_effect)
+      INSERT INTO biomes (name, play_cost, color, bit_effect)
       VALUES (?, ?, ?, ?)
     `,
 		params: (s: any) => [s.name, s.playCost, s.color, s.bitEffect],
@@ -27,6 +27,11 @@ export const relicConfig = {
 			if (eff) errors.push(eff);
 		}
 
+		if (s.traits !== undefined) {
+			const t = validateStringArray("traits", s.traits);
+			if (t) errors.push(t);
+		}
+
 		if (s.keywords !== undefined) {
 			const k = validateStringArray("keywords", s.keywords);
 			if (k) errors.push(k);
@@ -36,12 +41,17 @@ export const relicConfig = {
 	nested: [
 		{
 			field: "effects",
-			handler: (id: number, v: any) => replaceEffects("relic", id, v),
+			handler: (id: number, v: any) => replaceEffects("biome", id, v),
+		},
+		{
+			field: "traits",
+			handler: (id: number, v: any) =>
+				replaceList("biome_traits", "biome_id", id, v, "trait"),
 		},
 		{
 			field: "keywords",
 			handler: (id: number, v: any) =>
-				replaceKeywords("relic_keywords", "relic_id", id, v),
+				replaceKeywords("biome_keywords", "biome_id", id, v),
 		},
 	],
 };

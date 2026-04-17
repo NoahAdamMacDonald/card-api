@@ -3,7 +3,7 @@ import { db } from "../db";
 import * as biomeTypes from "../types/biome";
 
 import { createCard } from "../util/createCard";
-import { biomeConfig } from "../config/biomeConfig";
+import { biomeConfig } from "../config/biome/biomePostConfig";
 
 import { 
     successResponse, 

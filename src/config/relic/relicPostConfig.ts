@@ -1,18 +1,18 @@
-import { replaceEffects, replaceList, replaceKeywords } from "../util/dbHelpers";
+import { replaceEffects, replaceKeywords } from "../../util/dbHelpers";
 
 import {
 	validatePositiveNumber,
 	validateEffectsArray,
 	validateStringArray,
-} from "../util/validation";
+} from "../../util/validation";
 
-export const programConfig = {
+export const relicConfig = {
 	required: ["name", "playCost", "color", "bitEffect"],
-	successMessage: "Successfully added new Program",
+	successMessage: "Successfully added new Relic",
 
 	insert: {
 		sql: `
-      INSERT INTO programs (name, play_cost, color, bit_effect)
+      INSERT INTO relics (name, play_cost, color, bit_effect)
       VALUES (?, ?, ?, ?)
     `,
 		params: (s: any) => [s.name, s.playCost, s.color, s.bitEffect],
@@ -27,11 +27,6 @@ export const programConfig = {
 			if (eff) errors.push(eff);
 		}
 
-		if (s.traits !== undefined) {
-			const t = validateStringArray("traits", s.traits);
-			if (t) errors.push(t);
-		}
-
 		if (s.keywords !== undefined) {
 			const k = validateStringArray("keywords", s.keywords);
 			if (k) errors.push(k);
@@ -41,17 +36,12 @@ export const programConfig = {
 	nested: [
 		{
 			field: "effects",
-			handler: (id: number, v: any) => replaceEffects("program", id, v),
-		},
-		{
-			field: "traits",
-			handler: (id: number, v: any) =>
-				replaceList("program_traits", "program_id", id, v, "trait"),
+			handler: (id: number, v: any) => replaceEffects("relic", id, v),
 		},
 		{
 			field: "keywords",
 			handler: (id: number, v: any) =>
-				replaceKeywords("program_keywords", "program_id", id, v),
+				replaceKeywords("relic_keywords", "relic_id", id, v),
 		},
 	],
 };
