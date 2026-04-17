@@ -3,7 +3,7 @@ import { db } from "../db";
 import * as relicTypes from "../types/relic";
 
 import { createCard } from "../util/createCard";
-import { relicConfig } from "../config/relicConfig";
+import { relicConfig } from "../config/relic/relicPostConfig";
 
 import { 
     successResponse, 
