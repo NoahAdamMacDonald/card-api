@@ -83,25 +83,40 @@ export function validateStringArray(field: string, value: any) {
 }
 
 
-/**
- * Validates that the given value is a positive number.
- * @param {string} field The name of the field being validated.
- * @param {any} value The value being validated.
- * @returns {null|{type: string, fields: any[]}} null if the value is valid, or an object describing the validation error.
- */
-export function validatePositiveNumber(field: string, value: any) {
-  if (typeof value !== "number" || value < 0) {
-    return {
-      type: "Invalid Value",
-      fields: [
-        {
-          field,
-          value: JSON.stringify(value),
-          reason: "must be a number that is 0 or greater"
-        }
-      ]
-    };
-  }
+
+export function validateNumber(
+	field: string,
+	value: any,
+	opts?: { min?: number; max?: number },
+) {
+	if (typeof value !== "number" || isNaN(value)) {
+		return {
+			type: "Invalid Value",
+			fields: [
+				{
+					field,
+					value: JSON.stringify(value),
+					reason: "must be a number",
+				},
+			],
+		};
+	}
+
+	if (opts?.min !== undefined && value < opts.min) {
+		return {
+			type: "Invalid Value",
+			fields: [{ field, value, reason: `must be >= ${opts.min}` }],
+		};
+	}
+
+	if (opts?.max !== undefined && value > opts.max) {
+		return {
+			type: "Invalid Value",
+			fields: [{ field, value, reason: `must be <= ${opts.max}` }],
+		};
+	}
+
+	return null;
 }
 
 
