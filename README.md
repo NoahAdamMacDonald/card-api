@@ -312,7 +312,7 @@ Required for all are `stats` where all other fields are put under
 | bitEffect | Yes | string |
 | effects | no | array of objects `{ text: "string", trigger: string[], available?: string }` |
 | traits | no | array of strings |
-| keyword| field | Required | Validation |
+| keywords | no | array of strings |
 
 **POST** `/api/program`
 
