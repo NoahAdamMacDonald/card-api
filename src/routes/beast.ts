@@ -325,7 +325,7 @@ data.patch("/:id", async (c) => {
     }
 
     if (s.keywords !== undefined) {
-        replaceList("beast_keywords", "beast_id", id, s.keywords, "keyword");
+        replaceKeywords("beast_keywords", "beast_id", id, s.keywords);
         updatedFields.push("stats.keywords");
     }
 
