@@ -6,7 +6,7 @@ import {
 	validateStringArray,
 } from "../../util/validation";
 
-export const relicConfig = {
+export const relicPostConfig = {
 	required: ["name", "playCost", "color", "bitEffect"],
 	successMessage: "Successfully added new Relic",
 

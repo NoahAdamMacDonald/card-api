@@ -12,7 +12,7 @@ import {
 	validateStringArray,
 } from "../../util/validation";
 
-export const beastConfig = {
+export const beastPostConfig = {
 	required: ["name", "playCost"],
 	successMessage: "Successfully added new Beast",
 

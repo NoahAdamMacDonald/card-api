@@ -1,4 +1,8 @@
-import { replaceEffects, replaceList, replaceKeywords } from "../../util/dbHelpers";
+import {
+	replaceEffects,
+	replaceList,
+	replaceKeywords,
+} from "../../util/dbHelpers";
 
 import {
 	validatePositiveNumber,
@@ -6,7 +10,7 @@ import {
 	validateStringArray,
 } from "../../util/validation";
 
-export const programConfig = {
+export const programPostConfig = {
 	required: ["name", "playCost", "color", "bitEffect"],
 	successMessage: "Successfully added new Program",
 
