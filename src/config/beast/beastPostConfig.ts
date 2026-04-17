@@ -13,7 +13,7 @@ import {
 } from "../../util/validation";
 
 export const beastPostConfig = {
-	required: ["name", "playCost"],
+	required: ["name", "playCost", "evoCost", "evoColor", "level"],
 	successMessage: "Successfully added new Beast",
 
 	insert: {
