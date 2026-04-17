@@ -14,6 +14,17 @@ export function successResponse(message: string) {
 
 
 //Validation Checkers
+
+
+/**
+ * Checks if all required fields are present in an object.
+ * If any field is missing, an error object is returned with a type of "missing required fields" and a list of missing fields.
+ * If all fields are present, null is returned.
+ *
+ * @param obj The object to check.
+ * @param fields The list of required fields.
+ * @returns An error object if any required field is missing, or null if all fields are present.
+ */
 export function validateRequired(obj: any, fields: string[]) {
     const missing: string[] = [];
 
@@ -35,6 +46,12 @@ export function validateRequired(obj: any, fields: string[]) {
     };
 }
 
+/**
+ * Validate that the given value is an array of strings.
+ * @param {string} field The name of the field being validated.
+ * @param {any} value The value being validated.
+ * @returns {null|{type: string, fields: any[]}} null if the value is valid, or an object describing the validation error.
+ */
 export function validateStringArray(field: string, value: any) {
     if (!Array.isArray(value)) {
         return {
@@ -66,6 +83,12 @@ export function validateStringArray(field: string, value: any) {
 }
 
 
+/**
+ * Validates that the given value is a positive number.
+ * @param {string} field The name of the field being validated.
+ * @param {any} value The value being validated.
+ * @returns {null|{type: string, fields: any[]}} null if the value is valid, or an object describing the validation error.
+ */
 export function validatePositiveNumber(field: string, value: any) {
   if (typeof value !== "number" || value < 0) {
     return {
@@ -82,6 +105,15 @@ export function validatePositiveNumber(field: string, value: any) {
 }
 
 
+/**
+ * Validates that the given value is an array of objects with the following structure:
+ * {
+ *   text: string,
+ *   trigger: string[]
+ * }
+ * @param {any} value The value being validated.
+ * @returns {null|{type: string, fields: any[]}} null if the value is valid, or an object describing the validation error.
+ */
 export function validateEffectsArray(value: any) {
     if (!Array.isArray(value)) {
         return {
@@ -128,6 +160,14 @@ export function validateEffectsArray(value: any) {
 
 
 //Helper functions
+
+
+/**
+ * Collects all validation errors from the given validators and groups them by type.
+ * Each error type is an object with a "type" property and a "fields" property, which is an array of objects with a "field" property, a "value" property, and a "reason" property.
+ * @param {...validators} Any number of validators, which can be null or an object describing a validation error.
+ * @returns An array of objects, each representing a group of validation errors of the same type.
+ */
 export function collectErrors(...validators: (any | null)[]) {
 	const filtered = validators.filter((v) => v !== null);
 	const grouped: Record<string, any> = {};
@@ -149,6 +189,18 @@ export function collectErrors(...validators: (any | null)[]) {
 }
 
 
+/**
+ * Updates a string field in the database with the given value.
+ * If the value is undefined, does nothing.
+ * @param {string} field The name of the field to update.
+ * @param {any} value The value to update the field with.
+ * @param {object} options An object with the following properties:
+ * @param {string} options.sqlField The name of the SQL field to update.
+ * @param {string} [options.parent] The parent field to update, if applicable.
+ * @param {string[]} [options.updates] An array to append the update SQL to.
+ * @param {any[]} [options.params] An array to append the parameter value to.
+ * @param {string[]} [options.updatedFields] An array to append the updated field name to.
+ */
 export function applyStringUpdate(
     field: string, 
     value: any, 
