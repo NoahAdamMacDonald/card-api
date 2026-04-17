@@ -6,12 +6,14 @@ import { createCard } from "../util/createCard";
 import { getCardbyId } from "../util/getCardbyId";
 import { deleteCard } from "../util/deleteCard";
 import { updateCard } from "../util/updateCard";
+import { replaceCard } from "../util/replaceCard";
 
 //config
 import { beastPostConfig } from "../config/beast/beastPostConfig";
 import { beastGetConfig } from "../config/beast/beastGetConfig";
 import { beastDeleteConfig } from "../config/beast/beastDeleteConfig";
 import { beastPatchConfig } from "../config/beast/beastPatchConfig";
+import { beastPutConfig } from "../config/beast/beastPutConfig";
 
 const data = new Hono();
 
@@ -37,6 +39,9 @@ data.post("/", (c) => createCard(c, beastPostConfig));
 
 //PATCH
 data.patch("/:id", (c) => updateCard(c, beastPatchConfig));
+
+//PUT
+data.put("/:id", (c) => replaceCard(c, beastPutConfig));
 
 //DELETE
 data.delete("/:id", (c) => deleteCard(c, beastDeleteConfig));

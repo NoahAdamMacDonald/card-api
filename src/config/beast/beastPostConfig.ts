@@ -4,6 +4,7 @@ import {
 	replaceRestrictions,
 	replaceSoulEffects,
 	replaceSpecial,
+	replaceKeywords,
 } from "../../util/dbHelpers";
 
 import {
@@ -64,7 +65,7 @@ export const beastPostConfig = {
 		{
 			field: "keywords",
 			handler: (id: number, v: any) =>
-				replaceList("beast_keywords", "beast_id", id, v, "keyword"),
+				replaceKeywords("beast_keywords", "beast_id", id, v),
 		},
 		{
 			field: "restrictions",

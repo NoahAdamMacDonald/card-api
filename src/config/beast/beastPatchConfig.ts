@@ -11,7 +11,7 @@ import {
 	replaceKeywords,
 	replaceRestrictions,
 	replaceSoulEffects,
-	replaceSpecial,
+	replaceSpecial
 } from "../../util/dbHelpers";
 
 export const beastPatchConfig = {
