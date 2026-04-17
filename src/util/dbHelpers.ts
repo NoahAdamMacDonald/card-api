@@ -20,6 +20,9 @@ export function replaceList(
     valueField: string
 ) {
     db.query(`DELETE FROM ${table} WHERE ${idField} = ?`).run(id);
+
+    if (!values || values.length === 0) return;
+
     for (const value of values) {
         db.query(`
         INSERT INTO ${table} (${idField}, ${valueField}) VALUES (?, ?)
@@ -49,6 +52,8 @@ export function replaceEffects(
 
     db.query(`DELETE FROM ${triggerTable} WHERE effect_id IN (SELECT id FROM ${effectTable} WHERE ${idField} = ?)`).run(id);
     db.query(`DELETE FROM ${effectTable} WHERE ${idField} = ?`).run(id);
+
+    if (!effects || effects.length === 0) return;
 
     //insert new
     for (const effect of effects) {
@@ -113,6 +118,8 @@ export function replaceSoulEffects(
 ) {
     db.query(`DELETE FROM beast_soul_effects WHERE beast_id = ?`).run(id);
 
+    if (!soulEffects || soulEffects.length === 0) return;
+
     for (const s of soulEffects) {
         db.query(`
             INSERT INTO beast_soul_effects (beast_id, trigger, available, text)
@@ -136,6 +143,10 @@ export function replaceSpecial(
     special: { name: string; text: string } | null
 ) {
     db.query(`DELETE FROM beast_special WHERE beast_id = ?`).run(id);
+
+    if (!special) return;
+
+    if (!special.name || !special.text) return;
 
     if (special) {
         db.query(`
