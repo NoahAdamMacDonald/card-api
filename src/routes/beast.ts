@@ -4,10 +4,12 @@ import { db } from "../db";
 //endpoint imports
 import { createCard } from "../util/createCard";
 import { getCardbyId } from "../util/getCardbyId";
+import { deleteCard } from "../util/deleteCard";
 
 //config
 import { beastPostConfig } from "../config/beast/beastPostConfig";
 import { beastGetConfig } from "../config/beast/beastGetConfig";
+import { beastDeleteConfig } from "../config/beast/beastDeleteConfig";
 
 //TODO: remove these imports after switching to util helpers
 import {
@@ -185,20 +187,7 @@ data.patch("/:id", async (c) => {
 });
 
 //DELETE
-data.delete("/:id", (c) => {
-	const id = Number(c.req.param("id"));
-
-	const exists = checkBeastExist(c, id);
-	if (!exists) return exists;
-
-	//Delete
-	db.query<unknown, [number]>(`DELETE FROM beasts WHERE id = ?`).run(id);
-
-	return c.json({
-		message: "Successfully deleted Beast",
-		success: true,
-	});
-});
+data.delete("/:id", (c) => deleteCard(c, beastDeleteConfig));
 
 //Helpers
 function checkBeastExist(c: any, id: number) {
