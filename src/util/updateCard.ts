@@ -1,6 +1,6 @@
 import { db } from "../db";
 import { checkExists } from "./checkExists";
-import { errorResponse } from "./validation";
+import { errorResponse, collectErrors } from "./validation";
 
 export async function updateCard(c: any, config: any) {
     const id = Number(c.req.param("id"));
@@ -49,7 +49,7 @@ export async function updateCard(c: any, config: any) {
     }
 
     if(errors.length > 0) {
-        return c.json(errorResponse(errors), 400);
+        return c.json(errorResponse(collectErrors(...errors)), 400);
     }
 
     //Update Nested
