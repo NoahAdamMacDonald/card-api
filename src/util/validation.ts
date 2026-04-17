@@ -106,6 +106,29 @@ export function validatePositiveNumber(field: string, value: any) {
 
 
 /**
+ * Validates that the given value is a string.
+ * @param {string} field The name of the field being validated.
+ * @param {any} value The value being validated.
+ * @returns {null|{type: string, fields: any[]}} null if the value is valid, or an object describing the validation error.
+ */
+export function validateString(field: string, value: any) {
+    if (typeof value !== "string") {
+        return {
+        type: "Invalid Value",
+        fields: [
+            {
+            field,
+            value: JSON.stringify(value),
+            reason: "must be a string"
+            }
+        ]
+        };
+    }
+    return null;
+}
+
+
+/**
  * Validates that the given value is an array of objects with the following structure:
  * {
  *   text: string,
