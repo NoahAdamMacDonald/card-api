@@ -17,7 +17,7 @@ export function getCardbyId(c: any, config: any) {
         const rows = db.query(nested.sql).all(id);
 
         if(nested.map) {
-            nestedResults[nested.field] = rows.map(nested.map);
+            nestedResults[nested.field] = nested.map(rows);
         } else {
             nestedResults[nested.field] = rows;
         }
