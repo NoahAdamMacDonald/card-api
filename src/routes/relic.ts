@@ -2,6 +2,9 @@ import { Hono } from "hono";
 import { db } from "../db";
 import * as relicTypes from "../types/relic";
 
+import { createCard } from "../util/createCard";
+import { relicConfig } from "../config/relicConfig";
+
 import { 
     successResponse, 
     errorResponse,
@@ -93,138 +96,7 @@ data.get("/:id", (c) => {
 });
 
 //POST
-data.post("/", async (c) => {
-    const body = await c.req.json().catch(() => null);
-
-    if (!body?.stats) {
-        return c.json(
-            errorResponse([{ type: "missing required fields", fields: ["stats"] }]),
-            400
-        );
-    }
-
-    const s = body.stats;
-
-    const errors = collectErrors(
-        validateRequired(s, ["name", "playCost", "color", "bitEffect"]),
-        validatePositiveNumber("playCost", s.playCost)
-    );
-
-    validateNestedRelicStats(s, errors);
-
-    if (errors.length > 0) {
-        return c.json(errorResponse(errors), 400);
-    }
-
-    const result = db.query<
-        unknown,
-        [string, number, string, string]
-    >(`
-        INSERT INTO relics (name, play_cost, color, bit_effect)
-        VALUES (?, ?, ?, ?)
-    `).run(s.name, s.playCost, s.color, s.bitEffect);
-
-    const relicId = result.lastInsertRowid as number;
-
-    if (s.effects) {
-        replaceEffects("relic", relicId, s.effects);
-    }
-
-    if (s.keywords) {
-        replaceKeywords("relic_keywords", "relic_id", relicId, s.keywords);
-    }
-
-    return c.json(successResponse("Successfully added new Relic"), 201);
-});
-
-
-//PATCH
-data.patch("/:id", async (c) => {
-    const id = Number(c.req.param("id"));
-    const body = await c.req.json().catch(() => null);
-
-    const exists = checkRelicExist(c, id);
-    if (!exists) return exists;
-
-    if (!body?.stats) {
-        return c.json(
-            errorResponse([{ type: "missing required fields", fields: ["stats"] }]),
-            400
-        );
-    }
-
-    const s = body.stats;
-
-    const updates: string[] = [];
-    const params: any[] = [];
-    const updatedFields: string[] = [];
-    const errors: any[] = [];
-
-    applyStringUpdate("name", s.name, {
-        sqlField: "name",
-        parent: "stats",
-        updates,
-        params,
-        updatedFields
-    });
-
-    applyNumberUpdate("playCost", s.playCost, {
-        sqlField: "play_cost",
-        parent: "stats",
-        updates,
-        params,
-        updatedFields,
-        errors
-    });
-
-    applyStringUpdate("color", s.color, {
-        sqlField: "color",
-        parent: "stats",
-        updates,
-        params,
-        updatedFields
-    });
-
-    applyStringUpdate("bitEffect", s.bitEffect, {
-        sqlField: "bit_effect",
-        parent: "stats",
-        updates,
-        params,
-        updatedFields
-    });
-
-    validateNestedRelicStats(s, errors);
-
-    if (errors.length > 0) {
-        return c.json(errorResponse(errors), 400);
-    }
-
-    //Nested updates
-    if (s.effects !== undefined) {
-        replaceEffects("relic", id, s.effects);
-        updatedFields.push("stats.effects");
-    }
-
-    if (s.keywords !== undefined) {
-        replaceKeywords("relic_keywords", "relic_id", id, s.keywords);
-        updatedFields.push("stats.keywords");
-    }
-
-    //Send update
-    if (updates.length > 0) {
-        params.push(id);
-        db.query<unknown, any[]>(`
-            UPDATE relics SET ${updates.join(", ")} WHERE id = ?
-        `).run(...params);
-    }
-
-    return c.json({
-        message: "Successfully updated Relic",
-        updatedFields,
-        success: true
-    });
-});
-
+data.post("/", (c) => createCard(c, relicConfig));
 
 //DELETE
 data.delete("/:id", (c) => {

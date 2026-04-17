@@ -2,6 +2,9 @@ import { Hono } from "hono";
 import { db } from "../db";
 import * as programTypes from "../types/program";
 
+import { createCard } from "../util/createCard";
+import { programConfig } from "../config/programConfig";
+
 import { 
     successResponse, 
     errorResponse,
@@ -104,53 +107,7 @@ data.get("/:id", (c) => {
 
 
 //POST
-data.post("/", async (c) => {
-    const body = await c.req.json().catch(() => null);
-
-    if (!body?.stats) {
-        return c.json(
-            errorResponse([{ type: "missing required fields", fields: ["stats"] }]),
-            400
-        );
-    }
-
-    const s = body.stats;
-
-    const errors = collectErrors(
-        validateRequired(s, ["name", "playCost", "color", "bitEffect"]),
-        validatePositiveNumber("playCost", s.playCost)
-    );
-
-    validateNestedProgramStats(s, errors);
-
-    if (errors.length > 0) {
-        return c.json(errorResponse(errors), 400);
-    }
-
-    const result = db.query<
-        unknown,
-        [string, number, string, string]
-    >(`
-        INSERT INTO programs (name, play_cost, color, bit_effect)
-        VALUES (?, ?, ?, ?)
-    `).run(s.name, s.playCost, s.color, s.bitEffect);
-
-    const programId = result.lastInsertRowid as number;
-
-    if (s.effects) {
-        replaceEffects("program", programId, s.effects);
-    }
-
-    if (s.traits) {
-        replaceList("program_traits", "program_id", programId, s.traits, "trait");
-    }
-
-    if (s.keywords) {
-        replaceKeywords("program_keywords", "program_id", programId, s.keywords);
-    }
-
-    return c.json(successResponse("Successfully added new Program"), 201);
-});
+data.post("/", (c) => createCard(c, programConfig));
 
 //PATCH
 data.patch("/:id", async (c) => {

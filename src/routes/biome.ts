@@ -2,6 +2,9 @@ import { Hono } from "hono";
 import { db } from "../db";
 import * as biomeTypes from "../types/biome";
 
+import { createCard } from "../util/createCard";
+import { biomeConfig } from "../config/biomeConfig";
+
 import { 
     successResponse, 
     errorResponse,
@@ -103,54 +106,7 @@ data.get("/:id", (c) => {
 });
 
 //POST
-data.post("/", async (c) => {
-    const body = await c.req.json().catch(() => null);
-
-    if (!body?.stats) {
-        return c.json(
-            errorResponse([{ type: "missing required fields", fields: ["stats"] }]),
-            400
-        );
-    }
-
-    const s = body.stats;
-
-    const errors = collectErrors(
-        validateRequired(s, ["name", "playCost", "color", "bitEffect"]),
-        validatePositiveNumber("playCost", s.playCost)
-    );
-
-    validateNestedBiomeStats(s, errors);
-
-    if (errors.length > 0) {
-        return c.json(errorResponse(errors), 400);
-    }
-
-    const result = db.query<
-        unknown,
-        [string, number, string, string]
-    >(`
-        INSERT INTO biomes (name, play_cost, color, bit_effect)
-        VALUES (?, ?, ?, ?)
-    `).run(s.name, s.playCost, s.color, s.bitEffect);
-
-    const biomeId = result.lastInsertRowid as number;
-
-    if (s.effects) {
-        replaceEffects("biome", biomeId, s.effects);
-    }
-
-    if (s.traits) {
-        replaceList("biome_traits", "biome_id", biomeId, s.traits, "trait");
-    }
-
-    if (s.keywords) {
-        replaceKeywords("biome_keywords", "biome_id", biomeId, s.keywords);
-    }
-
-    return c.json(successResponse("Successfully added new Biome"), 201);
-});
-
+data.post("/", (c) => createCard(c, biomeConfig));
 
 //PATCH
 data.patch("/:id", async (c) => {
