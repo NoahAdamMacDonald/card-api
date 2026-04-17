@@ -1,9 +1,10 @@
 import {
 	applyStringUpdate,
 	applyNumberUpdate,
-	validateEffectsArray,
-	validateStringArray,
+	validateSchema,
 } from "../../util/validation";
+
+import { beastSchema } from "./beastSchema";
 
 import {
 	replaceEffects,
@@ -11,7 +12,7 @@ import {
 	replaceKeywords,
 	replaceRestrictions,
 	replaceSoulEffects,
-	replaceSpecial
+	replaceSpecial,
 } from "../../util/dbHelpers";
 
 export const beastPatchConfig = {
@@ -29,45 +30,11 @@ export const beastPatchConfig = {
 	],
 
 	validateNested(s: any, errors: any[]) {
-		if (s.effects !== undefined) {
-			const e = validateEffectsArray(s.effects);
-			if (e) errors.push(e);
-		}
-
-		if (s.traits !== undefined) {
-			const t = validateStringArray("traits", s.traits);
-			if (t) errors.push(t);
-		}
-
-		if (s.keywords !== undefined) {
-			const k = validateStringArray("keywords", s.keywords);
-			if (k) errors.push(k);
-		}
-
-		if (s.restrictions !== undefined) {
-			const r = validateStringArray("restrictions", s.restrictions);
-			if (r) errors.push(r);
-		}
-
-		if (s.soulEffects !== undefined && !Array.isArray(s.soulEffects)) {
-			errors.push({
-				type: "Invalid Value",
-				fields: [
-					{
-						field: "soulEffects",
-						value: JSON.stringify(s.soulEffects),
-						reason: "must be an array",
-					},
-				],
-			});
-		}
+		validateSchema(beastSchema, s, errors);
 	},
 
 	nested: [
-		{
-			field: "effects",
-			handler: (id: number, v: any) => replaceEffects("beast", id, v),
-		},
+		{ field: "effects", handler: (id: number, v: any) => replaceEffects("beast", id, v) },
 		{
 			field: "traits",
 			handler: (id: number, v: any) =>
@@ -78,17 +45,8 @@ export const beastPatchConfig = {
 			handler: (id: number, v: any) =>
 				replaceKeywords("beast_keywords", "beast_id", id, v),
 		},
-		{
-			field: "restrictions",
-			handler: (id: number, v: any) => replaceRestrictions(id, v),
-		},
-		{
-			field: "soulEffects",
-			handler: (id: number, v: any) => replaceSoulEffects(id, v),
-		},
-		{
-			field: "special",
-			handler: (id: number, v: any) => replaceSpecial(id, v),
-		},
+		{ field: "restrictions", handler: (id: number, v: any) => replaceRestrictions(id, v) },
+		{ field: "soulEffects", handler: (id: number, v: any) => replaceSoulEffects(id, v) },
+		{ field: "special", handler: (id: number, v: any) => replaceSpecial(id, v) },
 	],
 };

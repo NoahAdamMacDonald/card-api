@@ -1,17 +1,13 @@
-import {
-	validatePositiveNumber,
-	validateEffectsArray,
-	validateStringArray,
-	validateString
-} from "../../util/validation";
+import { validateSchema } from "../../util/validation";
+import { beastSchema } from "./beastSchema";
 
 import {
 	replaceEffects,
 	replaceList,
 	replaceKeywords,
-    replaceSoulEffects,
-    replaceSpecial,
-    replaceRestrictions
+	replaceRestrictions,
+	replaceSoulEffects,
+	replaceSpecial,
 } from "../../util/dbHelpers";
 
 export const beastPutConfig = {
@@ -38,44 +34,15 @@ export const beastPutConfig = {
 	},
 
 	validate(s: any, errors: any[]) {
-		const nameErr = validateString("name", s.name);
-		if (nameErr) errors.push(nameErr);
-
-		const evoColorErr = validateString("evoColor", s.evoColor);
-		if (evoColorErr) errors.push(evoColorErr);
-
-		const pc = validatePositiveNumber("playCost", s.playCost);
-		if (pc) errors.push(pc);
-
-		const lvl = validatePositiveNumber("level", s.level);
-		if (lvl) errors.push(lvl);
-
-		const bts = validatePositiveNumber("bts", s.bts);
-		if (bts) errors.push(bts);
-
-		const ec = validatePositiveNumber("evoCost", s.evoCost);
-		if (ec) errors.push(ec);
+		validateSchema(beastSchema, s, errors);
 	},
 
 	validateNested(s: any, errors: any[]) {
-		const eff = validateEffectsArray(s.effects);
-		if (eff) errors.push(eff);
-
-		const traits = validateStringArray("traits", s.traits);
-		if (traits) errors.push(traits);
-
-		const keywords = validateStringArray("keywords", s.keywords);
-		if (keywords) errors.push(keywords);
-
-		const restrictions = validateStringArray("restrictions", s.restrictions);
-		if (restrictions) errors.push(restrictions);
+		validateSchema(beastSchema, s, errors);
 	},
 
 	nested: [
-		{
-			field: "effects",
-			handler: (id: number, v: any) => replaceEffects("beast", id, v),
-		},
+		{ field: "effects", handler: (id: number, v: any) => replaceEffects("beast", id, v) },
 		{
 			field: "traits",
 			handler: (id: number, v: any) =>
@@ -86,17 +53,8 @@ export const beastPutConfig = {
 			handler: (id: number, v: any) =>
 				replaceKeywords("beast_keywords", "beast_id", id, v),
 		},
-		{
-			field: "restrictions",
-			handler: (id: number, v: any) => replaceRestrictions(id, v),
-		},
-		{
-			field: "soulEffects",
-			handler: (id: number, v: any) => replaceSoulEffects(id, v),
-		},
-		{
-			field: "special",
-			handler: (id: number, v: any) => replaceSpecial(id, v),
-		},
+		{ field: "restrictions", handler: (id: number, v: any) => replaceRestrictions(id, v) },
+		{ field: "soulEffects", handler: (id: number, v: any) => replaceSoulEffects(id, v) },
+		{ field: "special", handler: (id: number, v: any) => replaceSpecial(id, v) },
 	],
 };
