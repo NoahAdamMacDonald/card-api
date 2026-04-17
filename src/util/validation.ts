@@ -82,12 +82,17 @@ export function validateStringArray(field: string, value: any) {
     return null;
 }
 
-
-
+/**
+ * Validates that the given value is a number within the given options.
+ * @param {string} field The name of the field being validated.
+ * @param {any} value The value being validated.
+ * @param {Object} [options] Optional object containing the minimum and maximum values for the number.
+ * @returns {null|{type: string, fields: any[]}} null if the value is valid, or an object describing the validation error.
+ */
 export function validateNumber(
 	field: string,
 	value: any,
-	opts?: { min?: number; max?: number },
+	options?: { min?: number; max?: number },
 ) {
 	if (typeof value !== "number" || isNaN(value)) {
 		return {
@@ -102,17 +107,17 @@ export function validateNumber(
 		};
 	}
 
-	if (opts?.min !== undefined && value < opts.min) {
+	if (options?.min !== undefined && value < options.min) {
 		return {
 			type: "Invalid Value",
-			fields: [{ field, value, reason: `must be >= ${opts.min}` }],
+			fields: [{ field, value, reason: `must be >= ${options.min}` }],
 		};
 	}
 
-	if (opts?.max !== undefined && value > opts.max) {
+	if (options?.max !== undefined && value > options.max) {
 		return {
 			type: "Invalid Value",
-			fields: [{ field, value, reason: `must be <= ${opts.max}` }],
+			fields: [{ field, value, reason: `must be <= ${options.max}` }],
 		};
 	}
 
@@ -196,6 +201,91 @@ export function validateEffectsArray(value: any) {
   return null;
 }
 
+export function validateSchema(
+	schema: Record<string, (value: any) => any>,
+	obj: any,
+	errors: any[],
+) {
+	if (!obj || typeof obj !== "object") return;
+
+	for (const key in schema) {
+		if (Object.prototype.hasOwnProperty.call(obj, key)) {
+			const validator = schema[key]!;
+			const err = validator(obj[key]);
+			if (err) errors.push(err);
+		}
+	}
+}
+
+
+export function validateObjectShape(
+	field: string,
+	value: any,
+	shape: Record<string, (value: any) => any>,
+) {
+	if (typeof value !== "object" || value === null || Array.isArray(value)) {
+		return {
+			type: "Invalid Value",
+			fields: [
+				{
+					field,
+					value: JSON.stringify(value),
+					reason: "must be an object",
+				},
+			],
+		};
+	}
+
+	const nestedErrors: any[] = [];
+
+	for (const key in shape) {
+		const validator = shape[key]!;
+		const err = validator((value as any)[key]);
+		if (err) {
+			nestedErrors.push({
+				field: `${field}.${key}`,
+				value: JSON.stringify((value as any)[key]),
+				reason: err.fields?.[0]?.reason ?? "invalid value",
+			});
+		}
+	}
+
+	return nestedErrors.length > 0
+		? { type: "Invalid Value", fields: nestedErrors }
+		: null;
+}
+
+
+
+export function validateArrayOfObjects(
+	field: string,
+	value: any,
+	shape: Record<string, (value: any) => any>,
+) {
+	if (!Array.isArray(value)) {
+		return {
+			type: "Invalid Value",
+			fields: [
+				{
+					field,
+					value: JSON.stringify(value),
+					reason: "must be an array",
+				},
+			],
+		};
+	}
+
+	const errors: any[] = [];
+
+	value.forEach((item, i) => {
+		const err = validateObjectShape(`${field}[${i}]`, item, shape);
+		if (err) errors.push(...err.fields);
+	});
+
+	return errors.length > 0 ? { type: "Invalid Value", fields: errors } : null;
+}
+
+
 
 //Helper functions
 
@@ -260,27 +350,44 @@ export function applyStringUpdate(
     options.updatedFields.push(fullField);
 }
 
+/**
+ * Updates a number field in the database with the given value.
+ * If the value is undefined, does nothing.
+ * If the value is invalid (i.e. not a number or less than 0), an error will be added to the options.errors array.
+ * @param {string} field The name of the field to update.
+ * @param {any} value The value to update the field with.
+ * @param {object} options An object with the following properties:
+ * @param {string} options.sqlField The name of the SQL field to update.
+ * @param {string} [options.parent] The parent field to update, if applicable.
+ * @param {string[]} [options.updates] An array to append the update SQL to.
+ * @param {any[]} [options.params] An array to append the parameter value to.
+ * @param {string[]} [options.updatedFields] An array to append the updated field name to.
+ * @param {any[]} [options.errors] An array to append any errors that occur during validation.
+ */
 export function applyNumberUpdate(
-    field: string,
-    value: any,
-    options: {
-        sqlField: string;
-        parent?: string;
-        updates: string[];
-        params: any[];
-        updatedFields: string[];
-        errors: any[];
-    }
+	field: string,
+	value: any,
+	options: {
+		sqlField: string;
+		parent?: string;
+		updates: string[];
+		params: any[];
+		updatedFields: string[];
+		errors: any[];
+	},
 ) {
-    if (value === undefined) return;
+	if (value === undefined) return;
 
-    const validation = validatePositiveNumber(field, value);
-    if (validation) options.errors.push(validation);
+	const validation = validateNumber(field, value, { min: 0 });
+	if (validation) {
+		options.errors.push(validation);
+		return;
+	}
 
-    options.updates.push(`${options.sqlField} = ?`);
-    options.params.push(value);
+	options.updates.push(`${options.sqlField} = ?`);
+	options.params.push(value);
 
-    const fullField = options.parent ? `${options.parent}.${field}`: field;
+	const fullField = options.parent ? `${options.parent}.${field}` : field;
 
-    options.updatedFields.push(fullField);
+	options.updatedFields.push(fullField);
 }
