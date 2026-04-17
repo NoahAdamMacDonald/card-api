@@ -146,6 +146,13 @@ export function validateString(field: string, value: any) {
     return null;
 }
 
+/**
+ * Validates an object against a schema.
+ * @param {Record<string, (value: any) => any>} schema The schema to validate against.
+ * @param {any} obj The object to validate.
+ * @param {any[]} errors An array to append any validation errors to.
+ * @returns void
+ */
 export function validateSchema(
 	schema: Record<string, (value: any) => any>,
 	obj: any,
@@ -163,6 +170,13 @@ export function validateSchema(
 }
 
 
+/**
+ * Validates that the given value is an object conforming to the given schema.
+ * @param {string} field The name of the field being validated.
+ * @param {any} value The value being validated.
+ * @param {Record<string, (value: any) => any>} shape The schema to validate against.
+ * @returns {null|{type: string, fields: any[]}} null if the value is valid, or an object describing the validation error.
+ */
 export function validateObjectShape(
 	field: string,
 	value: any,
@@ -200,6 +214,14 @@ export function validateObjectShape(
 		: null;
 }
 
+/**
+ * Validates that the given value is an object that matches the given shape.
+ * If the given value is null, returns null.
+ * @param {string} field The name of the field being validated.
+ * @param {any} value The value being validated.
+ * @param {Record<string, (value: any) => any>} shape The schema to validate against.
+ * @returns {null|{type: string, fields: any[]}} null if the value is valid, or an object describing the validation error.
+ */
 export function validateNullableObjectShape(
 	field: string,
 	value: any,
