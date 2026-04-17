@@ -5,11 +5,13 @@ import { db } from "../db";
 import { createCard } from "../util/createCard";
 import { getCardbyId } from "../util/getCardbyId";
 import { deleteCard } from "../util/deleteCard";
+import { updateCard } from "../util/updateCard";
 
 //config
 import { beastPostConfig } from "../config/beast/beastPostConfig";
 import { beastGetConfig } from "../config/beast/beastGetConfig";
 import { beastDeleteConfig } from "../config/beast/beastDeleteConfig";
+import { beastPatchConfig } from "../config/beast/beastPatchConfig";
 
 //TODO: remove these imports after switching to util helpers
 import {
@@ -58,133 +60,7 @@ data.get("/:id", (c) => getCardbyId(c, beastGetConfig));
 data.post("/", (c) => createCard(c, beastPostConfig));
 
 //PATCH
-data.patch("/:id", async (c) => {
-	const id = Number(c.req.param("id"));
-	const body = await c.req.json().catch(() => null);
-
-	const exists = checkBeastExist(c, id);
-	if (!exists) return exists;
-
-	if (!body?.stats) {
-		return c.json(
-			errorResponse([
-				{ type: "missing required fields", fields: ["stats"] },
-			]),
-			400,
-		);
-	}
-
-	const s = body.stats;
-
-	const updates: string[] = [];
-	const params: any[] = [];
-	const updatedFields: string[] = [];
-	const errors: any[] = [];
-
-	//Apply updates
-	applyStringUpdate("name", s.name, {
-		sqlField: "name",
-		parent: "stats",
-		updates,
-		params,
-		updatedFields,
-	});
-
-	applyNumberUpdate("playCost", s.playCost, {
-		sqlField: "play_cost",
-		parent: "stats",
-		updates,
-		params,
-		updatedFields,
-		errors,
-	});
-
-	applyNumberUpdate("level", s.level, {
-		sqlField: "level",
-		parent: "stats",
-		updates,
-		params,
-		updatedFields,
-		errors,
-	});
-
-	applyNumberUpdate("BTS", s.BTS, {
-		sqlField: "bts",
-		parent: "stats",
-		updates,
-		params,
-		updatedFields,
-		errors,
-	});
-
-	applyNumberUpdate("evoCost", s.evoCost, {
-		sqlField: "evo_cost",
-		parent: "stats",
-		updates,
-		params,
-		updatedFields,
-		errors,
-	});
-
-	applyStringUpdate("evoColor", s.evoColor, {
-		sqlField: "evo_color",
-		parent: "stats",
-		updates,
-		params,
-		updatedFields,
-	});
-
-	validateNestedBeastStats(s, errors);
-
-	if (errors.length > 0) {
-		return c.json(errorResponse(errors), 400);
-	}
-
-	if (s.effects !== undefined) {
-		replaceEffects("beast", id, s.effects);
-		updatedFields.push("stats.effects");
-	}
-
-	if (s.traits !== undefined) {
-		replaceList("beast_traits", "beast_id", id, s.traits, "trait");
-		updatedFields.push("stats.traits");
-	}
-
-	if (s.keywords !== undefined) {
-		replaceKeywords("beast_keywords", "beast_id", id, s.keywords);
-		updatedFields.push("stats.keywords");
-	}
-
-	if (s.restrictions !== undefined) {
-		replaceRestrictions(id, s.restrictions);
-		updatedFields.push("stats.restrictions");
-	}
-
-	if (s.soulEffects !== undefined) {
-		replaceSoulEffects(id, s.soulEffects);
-		updatedFields.push("stats.soulEffects");
-	}
-
-	if (s.special !== undefined) {
-		replaceSpecial(id, s.special);
-		updatedFields.push("stats.special");
-	}
-
-	if (updates.length > 0) {
-		params.push(id);
-		db.query<unknown, any[]>(
-			`
-            UPDATE beasts SET ${updates.join(", ")} WHERE id = ?
-        `,
-		).run(...params);
-	}
-
-	return c.json({
-		message: "Successfully updated Beast",
-		updatedFields,
-		success: true,
-	});
-});
+data.patch("/:id", (c) => updateCard(c, beastPatchConfig));
 
 //DELETE
 data.delete("/:id", (c) => deleteCard(c, beastDeleteConfig));
