@@ -11,6 +11,7 @@ import {
 	validatePositiveNumber,
 	validateEffectsArray,
 	validateStringArray,
+	validateString
 } from "../../util/validation";
 
 export const beastPostConfig = {
@@ -33,8 +34,25 @@ export const beastPostConfig = {
 	},
 
 	validate(s: any, errors: any[]) {
-		const base = validatePositiveNumber("playCost", s.playCost);
-		if (base) errors.push(base);
+		const nameErr = validateString("name", s.name);
+		if (nameErr) errors.push(nameErr);
+
+		const evoColorErr = validateString("evoColor", s.evoColor);
+		if (evoColorErr) errors.push(evoColorErr);
+
+		
+
+		const pc = validatePositiveNumber("playCost", s.playCost);
+		if (pc) errors.push(pc);
+
+		const lvl = validatePositiveNumber("level", s.level);
+		if (lvl) errors.push(lvl);
+
+		const bts = validatePositiveNumber("bts", s.bts);
+		if (bts) errors.push(bts);
+
+		const ec = validatePositiveNumber("evoCost", s.evoCost);
+		if (ec) errors.push(ec);
 
 		if (s.effects !== undefined) {
 			const eff = validateEffectsArray(s.effects);
@@ -51,7 +69,6 @@ export const beastPostConfig = {
 			if (k) errors.push(k);
 		}
 	},
-
 	nested: [
 		{
 			field: "effects",

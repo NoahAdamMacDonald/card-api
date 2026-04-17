@@ -23,7 +23,7 @@ export const beastPatchConfig = {
 		{ name: "name", sqlField: "name", apply: applyStringUpdate },
 		{ name: "playCost", sqlField: "play_cost", apply: applyNumberUpdate },
 		{ name: "level", sqlField: "level", apply: applyNumberUpdate },
-		{ name: "BTS", sqlField: "bts", apply: applyNumberUpdate },
+		{ name: "bts", sqlField: "bts", apply: applyNumberUpdate },
 		{ name: "evoCost", sqlField: "evo_cost", apply: applyNumberUpdate },
 		{ name: "evoColor", sqlField: "evo_color", apply: applyStringUpdate },
 	],
@@ -33,18 +33,22 @@ export const beastPatchConfig = {
 			const e = validateEffectsArray(s.effects);
 			if (e) errors.push(e);
 		}
+
 		if (s.traits !== undefined) {
 			const t = validateStringArray("traits", s.traits);
 			if (t) errors.push(t);
 		}
+
 		if (s.keywords !== undefined) {
 			const k = validateStringArray("keywords", s.keywords);
 			if (k) errors.push(k);
 		}
+
 		if (s.restrictions !== undefined) {
 			const r = validateStringArray("restrictions", s.restrictions);
 			if (r) errors.push(r);
 		}
+
 		if (s.soulEffects !== undefined && !Array.isArray(s.soulEffects)) {
 			errors.push({
 				type: "Invalid Value",

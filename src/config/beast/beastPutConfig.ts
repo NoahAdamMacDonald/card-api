@@ -2,6 +2,7 @@ import {
 	validatePositiveNumber,
 	validateEffectsArray,
 	validateStringArray,
+	validateString
 } from "../../util/validation";
 
 import {
@@ -37,6 +38,12 @@ export const beastPutConfig = {
 	},
 
 	validate(s: any, errors: any[]) {
+		const nameErr = validateString("name", s.name);
+		if (nameErr) errors.push(nameErr);
+
+		const evoColorErr = validateString("evoColor", s.evoColor);
+		if (evoColorErr) errors.push(evoColorErr);
+
 		const pc = validatePositiveNumber("playCost", s.playCost);
 		if (pc) errors.push(pc);
 
