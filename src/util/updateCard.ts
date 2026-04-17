@@ -3,21 +3,21 @@ import { checkExists } from "./checkExists";
 import { errorResponse } from "./validation";
 
 export async function updateCard(c: any, config: any) {
-	const id = Number(c.req.param("id"));
-	const body = await c.req.json().catch(() => null);
+    const id = Number(c.req.param("id"));
+    const body = await c.req.json().catch(() => null);
 
-	const exists = checkExists(c, config.table, id, config.notFoundMessage);
-	if (!exists || exists instanceof Response) return exists;
+    const exists = checkExists(c, config.table, id, config.notFoundMessage);
+    if (!exists || exists instanceof Response) return exists;
 
-	//Validate Base
-	if (!body?.stats) {
-		return c.json(
-			errorResponse([
-				{ type: "missing required fields", fields: ["stats"] },
-			]),
-			400,
-		);
-	}
+    //Validate Base
+    if (!body?.stats) {
+        return c.json(
+            errorResponse([
+                { type: "missing required fields", fields: ["stats"] },
+            ]),
+            400,
+        );
+    }
 
     const s = body.stats;
     const updates: string[] = [];
@@ -26,12 +26,12 @@ export async function updateCard(c: any, config: any) {
     const errors: any[] = [];
 
     //Update base
-    for(const field of config.baseFields) {
-        const value = s[field];
-        
-        if(value===undefined) continue;
+    for (const field of config.baseFields) {
+        const value = s[field.name];
 
-        field.apply(value, {
+        if (value === undefined) continue;
+
+        field.apply(field.name, value, {
             sqlField: field.sqlField,
             parent: "stats",
             updates,
@@ -40,6 +40,8 @@ export async function updateCard(c: any, config: any) {
             errors,
         });
     }
+
+
 
     //Validate Nested
     if(config.validateNested) {
