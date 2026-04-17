@@ -1,10 +1,7 @@
-import { replaceEffects, replaceKeywords } from "../../util/dbHelpers";
+import { validateSchema } from "../../util/validation";
+import { relicSchema } from "./relicSchema";
 
-import {
-	validatePositiveNumber,
-	validateEffectsArray,
-	validateStringArray,
-} from "../../util/validation";
+import { replaceEffects, replaceKeywords } from "../../util/dbHelpers";
 
 export const relicPostConfig = {
 	required: ["name", "playCost", "color", "bitEffect"],
@@ -12,25 +9,14 @@ export const relicPostConfig = {
 
 	insert: {
 		sql: `
-      INSERT INTO relics (name, play_cost, color, bit_effect)
-      VALUES (?, ?, ?, ?)
-    `,
+            INSERT INTO relics (name, play_cost, color, bit_effect)
+            VALUES (?, ?, ?, ?)
+        `,
 		params: (s: any) => [s.name, s.playCost, s.color, s.bitEffect],
 	},
 
 	validate(s: any, errors: any[]) {
-		const base = validatePositiveNumber("playCost", s.playCost);
-		if (base) errors.push(base);
-
-		if (s.effects !== undefined) {
-			const eff = validateEffectsArray(s.effects);
-			if (eff) errors.push(eff);
-		}
-
-		if (s.keywords !== undefined) {
-			const k = validateStringArray("keywords", s.keywords);
-			if (k) errors.push(k);
-		}
+		validateSchema(relicSchema, s, errors);
 	},
 
 	nested: [

@@ -1,9 +1,10 @@
 import {
 	applyStringUpdate,
 	applyNumberUpdate,
-	validateEffectsArray,
-	validateStringArray,
+	validateSchema,
 } from "../../util/validation";
+
+import { relicSchema } from "./relicSchema";
 
 import { replaceEffects, replaceKeywords } from "../../util/dbHelpers";
 
@@ -20,14 +21,7 @@ export const relicPatchConfig = {
 	],
 
 	validateNested(s: any, errors: any[]) {
-		if (s.effects !== undefined) {
-			const e = validateEffectsArray(s.effects);
-			if (e) errors.push(e);
-		}
-		if (s.keywords !== undefined) {
-			const k = validateStringArray("keywords", s.keywords);
-			if (k) errors.push(k);
-		}
+		validateSchema(relicSchema, s, errors);
 	},
 
 	nested: [
