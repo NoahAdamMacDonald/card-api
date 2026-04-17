@@ -20,12 +20,12 @@ const data = new Hono();
 //GET
 data.get("/", (c) => {
 	//filters
-	const page = Number(c.req.param("page") ?? 1);
-	const limit = Number(c.req.param("limit") ?? 20);
-	const name = c.req.param("name") ?? null;
-	const minLevel = Number(c.req.param("minLevel") ?? null);
-	const maxLevel = Number(c.req.param("maxLevel") ?? null);
-	const evoColor = c.req.param("evoColor") ?? null;
+	const page = Number(c.req.query("page") ?? 1);
+	const limit = Number(c.req.query("limit") ?? 20);
+	const name = c.req.query("name") ?? null;
+	const minLevel = Number(c.req.query("minLevel") ?? null);
+	const maxLevel = Number(c.req.query("maxLevel") ?? null);
+	const evoColor = c.req.query("evoColor") ?? null;
 
 	const offset = (page - 1) * limit;
 
