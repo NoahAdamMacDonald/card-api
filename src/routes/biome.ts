@@ -6,12 +6,14 @@ import { createCard } from "../util/createCard";
 import { getCardbyId } from "../util/getCardbyId";
 import { deleteCard } from "../util/deleteCard";
 import { updateCard } from "../util/updateCard";
+import { replaceCard } from "../util/replaceCard";
 
 //config
 import { biomePostConfig } from "../config/biome/biomePostConfig";
 import { biomeGetConfig } from "../config/biome/biomeGetConfig";
 import { biomeDeleteConfig } from "../config/biome/biomeDeleteConfig";
 import { biomePatchConfig } from "../config/biome/biomePatchConfig";
+import { biomePutConfig } from "../config/biome/biomePutConfig";
 
 const data = new Hono();
 
@@ -37,6 +39,9 @@ data.post("/", (c) => createCard(c, biomePostConfig));
 
 //PATCH
 data.patch("/:id", (c) => updateCard(c, biomePatchConfig));
+
+//PUT
+data.put("/:id", (c) => replaceCard(c, biomePutConfig));
 
 //DELETE
 data.delete("/:id", (c) => deleteCard(c, biomeDeleteConfig));
