@@ -1,14 +1,14 @@
 export function errorResponse(errors: any[]) {
   return {
-    success: false,
-    errors
+		errors,
+		success: false,
   };
 }
 
 export function successResponse(message: string) {
   return {
-    success: true,
-    message
+		message,
+		success: true,
   };
 }
 
