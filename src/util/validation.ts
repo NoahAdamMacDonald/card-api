@@ -12,35 +12,6 @@ export function successResponse(message: string) {
 	};
 }
 
-
-export function validatePositiveNumber(field: string, value: any) {
-    if (typeof value !== "number") {
-        return {
-            type: "Invalid Value",
-            fields: [
-                {
-                field,
-                value: JSON.stringify(value),
-                reason: "must be a number",
-                },
-            ],
-        };
-    }
-    if (value < 0) {
-        return {
-            type: "Invalid Value",
-            fields: [
-                {
-                field,
-                value,
-                reason: "must be a positive number",
-                },
-            ],
-        }
-    }
-    return null
-}
-
 //Validation Checkers
 
 
@@ -173,60 +144,6 @@ export function validateString(field: string, value: any) {
         };
     }
     return null;
-}
-
-
-/**
- * Validates that the given value is an array of objects with the following structure:
- * {
- *   text: string,
- *   trigger: string[]
- * }
- * @param {any} value The value being validated.
- * @returns {null|{type: string, fields: any[]}} null if the value is valid, or an object describing the validation error.
- */
-export function validateEffectsArray(value: any) {
-    if (!Array.isArray(value)) {
-        return {
-        type: "Invalid Value",
-        fields: [
-            {
-            field: "effects",
-            value: JSON.stringify(value),
-            reason: "must be an array"
-            }
-        ]
-        };
-    }
-
-    for (const effect of value) {
-        if (typeof effect.text !== "string") {
-        return {
-            type: "Invalid Value",
-            fields: [
-            {
-                field: "effects.text",
-                value: JSON.stringify(effect.text),
-                reason: "must be a string"
-            }
-            ]
-        };
-        }
-
-        if (!Array.isArray(effect.trigger)) {
-        return {
-            type: "Invalid Value",
-            fields: [
-            {
-                field: "effects.trigger",
-                value: JSON.stringify(effect.trigger),
-                reason: "must be an array of strings"
-            }
-            ]
-        };
-        }
-    }
-  return null;
 }
 
 export function validateSchema(
