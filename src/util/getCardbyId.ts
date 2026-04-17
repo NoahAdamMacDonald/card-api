@@ -40,11 +40,16 @@ export function getCardbyId(c: any, config: any) {
         }
 
         return c.json({
+            id,
             cardType: result.cardType,
             stats: filteredStats,
         });
     }
 
     //return all fields
-    return c.json(result);
+    return c.json({
+        id,
+        cardType: result.cardType,
+        stats: result.stats,
+    });
 }
