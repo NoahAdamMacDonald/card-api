@@ -67,18 +67,19 @@ export function validateStringArray(field: string, value: any) {
 
 
 export function validatePositiveNumber(field: string, value: any) {
-    if(typeof value !== "number" || value < 0) {
-        return {
+	if (typeof value !== "number" || value < 0) {
+		return {
 			type: "Invalid Value",
 			fields: [
-                { 
-                    field,
-                    reason: "Must be a number that is 0 or greater" 
-                }
-            ],
+				{
+					field,
+					reason: "must be a number ≥ 0",
+				},
+			],
 		};
-    }
+	}
 }
+
 
 export function validateEffectsArray(value: any) {
     if (!Array.isArray(value)) {
