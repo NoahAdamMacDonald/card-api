@@ -1,6 +1,8 @@
 import { db } from "../db";
 import { checkExists } from "./checkExists";
 
+import { successResponse } from "./validation";
+
 export function deleteCard(c: any, config: any) {
     const id = Number(c.req.param("id"));
 
@@ -9,8 +11,6 @@ export function deleteCard(c: any, config: any) {
     
     db.query(`DELETE FROM ${config.table} WHERE id = ?`).run(id);
 
-    return c.json({
-        message: config.successMessage,
-        success: true,
-    });
+    return c.json(successResponse(config.successMessage));
+
 }

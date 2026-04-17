@@ -6,10 +6,10 @@ export function errorResponse(errors: any[]) {
 }
 
 export function successResponse(message: string) {
-  return {
+	return {
 		message,
 		success: true,
-  };
+	};
 }
 
 

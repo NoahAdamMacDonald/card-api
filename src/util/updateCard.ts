@@ -1,6 +1,6 @@
 import { db } from "../db";
 import { checkExists } from "./checkExists";
-import { errorResponse, collectErrors } from "./validation";
+import { successResponse, errorResponse, collectErrors } from "./validation";
 
 export async function updateCard(c: any, config: any) {
     const id = Number(c.req.param("id"));
@@ -69,8 +69,7 @@ export async function updateCard(c: any, config: any) {
     }
 
     return c.json({
-        message: config.successMessage,
+        ...successResponse(config.successMessage),
         updatedFields,
-        success: true,
     });
 }

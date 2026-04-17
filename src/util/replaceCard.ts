@@ -1,6 +1,6 @@
 import { db } from "../db";
 import { checkExists } from "./checkExists";
-import { errorResponse, collectErrors } from "./validation";
+import { successResponse, errorResponse, collectErrors } from "./validation";
 
 export async function replaceCard(c: any, config: any) {
     const id = Number(c.req.param("id"));
@@ -55,8 +55,6 @@ export async function replaceCard(c: any, config: any) {
         nested.handler(id, s[nested.field] ?? []);
     }
 
-    return c.json({
-        message: config.successMessage,
-        success: true,
-    });
+    return c.json(successResponse(config.successMessage));
+
 }
