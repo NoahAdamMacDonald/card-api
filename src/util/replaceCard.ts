@@ -57,7 +57,6 @@ export async function replaceCard(c: any, config: any) {
 
     return c.json({
         message: config.successMessage,
-        replaced: true,
         success: true,
     });
 }
