@@ -31,7 +31,7 @@ data.get("/", (c) => {
 
     const rows = db
 	.query(`
-		SELECT id, name, play_cost, level, bts, evo_cost, evo_color
+		SELECT id, name
 		FROM beasts
 		WHERE (?1 IS NULL OR name LIKE '%' || ?1 || '%')
 		AND (?2 IS NULL OR level >= ?2)
