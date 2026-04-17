@@ -73,7 +73,8 @@ export function validatePositiveNumber(field: string, value: any) {
       fields: [
         {
           field,
-          reason: "must be a number ≥ 0"
+          value: JSON.stringify(value),
+          reason: "must be a number that is 0 or greater"
         }
       ]
     };
