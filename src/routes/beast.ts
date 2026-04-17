@@ -19,17 +19,34 @@ const data = new Hono();
 
 //GET
 data.get("/", (c) => {
-	const rows = db
-		.query(
-			`
-        SELECT id, name
-        FROM beasts
-        ORDER BY id
-    `,
-		)
-		.all();
+	//filters
+	const page = Number(c.req.param("page") ?? 1);
+	const limit = Number(c.req.param("limit") ?? 20);
+	const name = c.req.param("name") ?? null;
+	const minLevel = Number(c.req.param("minLevel") ?? null);
+	const maxLevel = Number(c.req.param("maxLevel") ?? null);
+	const evoColor = c.req.param("evoColor") ?? null;
 
-	return c.json(rows);
+	const offset = (page - 1) * limit;
+
+    const rows = db
+	.query(`
+		SELECT id, name, play_cost, level, bts, evo_cost, evo_color
+		FROM beasts
+		WHERE (?1 IS NULL OR name LIKE '%' || ?1 || '%')
+		AND (?2 IS NULL OR level >= ?2)
+		AND (?3 IS NULL OR level <= ?3)
+		AND (?4 IS NULL OR evo_color = ?4)
+		ORDER BY id
+		LIMIT ?5 OFFSET ?6
+    `,).all(name, minLevel, maxLevel, evoColor, limit, offset);
+
+    return c.json({
+		page,
+		limit,
+		count: rows.length,
+		results: rows,
+	});
 });
 
 data.get("/:id", (c) => getCardbyId(c, beastGetConfig));
