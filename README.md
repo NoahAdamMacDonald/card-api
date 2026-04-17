@@ -52,6 +52,7 @@ Tables for all core resources
 - [x] Constraints (`NOT NULL`, `CHECK` constraints, foreign keys)
 - [x] Seed data included
 - [x] Data integrity enforced
+- [x] Filter, pagination and field selection
 
 ### Example Schema
 #### Beast
@@ -148,11 +149,234 @@ PUT    /api/<type>/:id
 DELETE /api/<type>/:id
 ```
 
-### API Types
+<details>
+<summary>types</summary>
+<p>beast</p>
+<p>biome</p>
+<p>program</p>
+<p>relic</p>
+</details>
 
 
+## CRUD
+### Create
+For creating cards, we support POST `/api/<type>`
+All types have required fields and validation for their fields.
 
+Required for all are `stats` where all other fields are put under
+```json
+{
+  "stats": {}
+}
+```
 
+#### beast
+| field | Required | Validation |
+| :--- | :--- | :--- |
+| name | Yes | string |
+| playCost | Yes | number >= 0 |
+| level | Yes | number >=0 |
+| evoColor | Yes | string |
+| evoCost | Yes | number >= 0 |
+| bts | no | number >= 0 |
+| traits | no | array of strings |
+| keywords | no | array of strings |
+| restrictions | no | array of strings |
+| effects | no | array of objects `{ text: "string", trigger: string[] }` |
+| soulEffects | no | array of objects `{ trigger: string, available: string, text: string }` |
+| special | no | nullable object `{ name: string, text: string }` |
+
+**POST** `/api/beast`
+
+```json
+{
+  "stats": {
+    "name": "Cyber Wolf",
+    "playCost": 5,
+    "level": 2,
+    "bts": 3,
+    "evoCost": 4,
+    "evoColor": "blue",
+    "traits": [
+      "Beast",
+      "Cyber"
+    ],
+    "keywords": [
+      "Fast",
+      "Hunter"
+    ],
+    "restrictions": [
+      "Cannot attack this turn"
+    ],
+    "effects": [
+      {
+        "text": "Gain +2 BTS this turn.",
+        "trigger": [
+          "On Play"
+        ]
+      },
+      {
+        "text": "Draw 1 card.",
+        "trigger": [
+          "All Turns"
+        ]
+      }
+    ],
+    "soulEffects": [
+      {
+        "trigger": "On Delete",
+        "available": "Always",
+        "text": "Draw 2 cards."
+      },
+      {
+        "trigger": "On Play",
+        "available": "Turn Start",
+        "text": "Gain 1 energy."
+      }
+    ],
+    "special": {
+      "name": "Overclock",
+      "text": "This beast gains +1 level while attacking."
+    }
+  }
+}
+```
+
+#### biome
+| field | Required | Validation |
+| :--- | :--- | :--- |
+| name | Yes | string |
+| playCost | Yes | number >= 0 |
+| color | Yes | string |
+| bitEffect | Yes | string |
+| effects | no | array of objects `{ text: "string", trigger: string[], available?: string }` |
+| traits | no | array of strings |
+| keywords | no | array of strings |
+
+**POST** `/api/biome`
+
+```json
+{
+  "stats": {
+    "name": "Crystal Forest",
+    "playCost": 3,
+    "color": "green",
+    "bitEffect": "All beasts gain +1 BTS while in this biome.",
+    "effects": [
+      {
+        "text": "When a beast enters this biome, draw 1 card.",
+        "trigger": [
+          "On Enter"
+        ],
+        "available": "Always"
+      },
+      {
+        "text": "Beasts with level 3 or higher gain +1 attack.",
+        "trigger": [
+          "All Turns"
+        ]
+      }
+    ],
+    "traits": [
+      "Forest",
+      "Crystal"
+    ],
+    "keywords": [
+      "Defensive",
+      "Nature"
+    ]
+  }
+}
+```
+
+#### program
+| field | Required | Validation |
+| :--- | :--- | :--- |
+| name | Yes | string |
+| playCost | Yes | number >= 0 |
+| color | Yes | string |
+| bitEffect | Yes | string |
+| effects | no | array of objects `{ text: "string", trigger: string[], available?: string }` |
+| traits | no | array of strings |
+| keyword| field | Required | Validation |
+
+**POST** `/api/program`
+
+```json
+{
+  "stats": {
+    "name": "Data Surge",
+    "playCost": 2,
+    "color": "blue",
+    "bitEffect": "Gain 1 extra action this turn.",
+    "effects": [
+      {
+        "text": "Draw 2 cards.",
+        "trigger": [
+          "On Play"
+        ]
+      },
+      {
+        "text": "If you have 3+ programs in play, gain +1 energy.",
+        "trigger": [
+          "Conditional"
+        ],
+        "available": "Turn Start"
+      }
+    ],
+    "traits": [
+      "Utility",
+      "Data"
+    ],
+    "keywords": [
+      "Instant",
+      "Support"
+    ]
+  }
+}
+```
+
+#### relic
+| field | Required | Validation |
+| :--- | :--- | :--- |
+| name | Yes | string |
+| playCost | Yes | number >= 0 |
+| color | Yes | string |
+| bitEffect | Yes | string |
+| effects | no | array of objects `{ text: "string", trigger: string[], available?: string }` |
+| keywords | no | array of strings |
+
+**POST** `/api/relic`
+
+```json
+{
+  "stats": {
+    "name": "Ancient Core",
+    "playCost": 4,
+    "color": "red",
+    "bitEffect": "Your beasts gain +1 attack while this relic is active.",
+    "effects": [
+      {
+        "text": "When this relic is played, heal 2 damage from any beast.",
+        "trigger": [
+          "On Play"
+        ]
+      },
+      {
+        "text": "At the start of your turn, gain 1 energy.",
+        "trigger": [
+          "Turn Start"
+        ],
+        "available": "Always"
+      }
+    ],
+    "keywords": [
+      "Artifact",
+      "Energy"
+    ]
+  }
+}
+```
 
 
 
