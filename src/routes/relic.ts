@@ -5,10 +5,12 @@ import * as relicTypes from "../types/relic";
 //endpoint imports
 import { createCard } from "../util/createCard";
 import { getCardbyId } from "../util/getCardbyId";
+import { deleteCard } from "../util/deleteCard";
 
 //config
 import { relicPostConfig } from "../config/relic/relicPostConfig";
 import { relicGetConfig } from "../config/relic/relicGetConfig";
+import { relicDeleteConfig } from "../config/relic/relicDeleteConfig";
 
 import {
 	successResponse,
@@ -47,20 +49,7 @@ data.get("/:id", (c) => getCardbyId(c, relicGetConfig));
 data.post("/", (c) => createCard(c, relicPostConfig));
 
 //DELETE
-data.delete("/:id", (c) => {
-	const id = Number(c.req.param("id"));
-
-	const exists = checkRelicExist(c, id);
-	if (!exists) return exists;
-
-	//Delete
-	db.query<unknown, [number]>(`DELETE FROM relics WHERE id = ?`).run(id);
-
-	return c.json({
-		message: "Successfully deleted Relic",
-		success: true,
-	});
-});
+data.delete("/:id", (c) => deleteCard(c, relicDeleteConfig));
 
 //helpers
 function checkRelicExist(c: any, id: number) {

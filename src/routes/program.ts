@@ -5,10 +5,13 @@ import * as programTypes from "../types/program";
 //endpoint imports
 import { createCard } from "../util/createCard";
 import { getCardbyId } from "../util/getCardbyId";
+import { deleteCard } from "../util/deleteCard";
 
 //config
 import { programPostConfig } from "../config/program/programPostConfig";
 import { programGetConfig } from "../config/program/programGetConfig";
+import { programDeleteConfig } from "../config/program/programDeleteConfig";
+
 
 import {
 	successResponse,
@@ -142,20 +145,7 @@ data.patch("/:id", async (c) => {
 });
 
 //DELETE
-data.delete("/:id", (c) => {
-	const id = Number(c.req.param("id"));
-
-	const exists = checkProgramExist(c, id);
-	if (!exists) return exists;
-
-	//Delete
-	db.query<unknown, [number]>(`DELETE FROM programs WHERE id = ?`).run(id);
-
-	return c.json({
-		message: "Successfully deleted Program",
-		success: true,
-	});
-});
+data.delete("/:id", (c) => deleteCard(c, programDeleteConfig));
 
 //Helper
 function checkProgramExist(c: any, id: number) {
