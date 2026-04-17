@@ -1,5 +1,7 @@
 # Card-API
 
+Available online [https://card-api.fly.dev/](https://card-api.fly.dev)
+
 A REST API for managing **Beasts**, **Programs**, **Biomes **and **Relics** for a 
 Deck Building Card Game.
 
