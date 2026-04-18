@@ -8,7 +8,7 @@ Deck Building Card Game.
 Built using **BUN** + **Hono**+ **SQLite**
 
 ## Group Members
-_Adam Johnston_ - _Matthew Hatcher_ - _Noah MacDonald_ - _Silas Mahoney_
+_Adam Johnston_ - _Mathew Hatcher_ - _Noah MacDonald_ - _Silas Mahoney_
 
 ## Navigation
 - [Project Overview](#project-overview)
