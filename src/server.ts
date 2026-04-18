@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { serveStatic } from "hono/bun";
+import { cors } from "hono/cors";
 
 //import routes
 import beast from "./routes/beast";
@@ -8,6 +9,15 @@ import program from "./routes/program";
 import biome from "./routes/biome";
 
 const app = new Hono();
+
+app.use(
+	"*",
+	cors({
+		origin: "*",
+		allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+		allowHeaders: ["Content-Type"],
+	}),
+);
 
 //app routing
 app.route("/api/beast", beast);
