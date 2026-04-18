@@ -154,6 +154,7 @@ bun run src/server.ts
 by default uses `localhost:3000`
 
 5. Seed data
+
 Data seeder provided in `index.ts` file.
 Provide data to seed files at 
 - `data/seed/beast.json`
@@ -164,9 +165,9 @@ provide data as **POST** body format inside array.
 
 Set baseUrl to `http://<server-address>/api/` by default set to `http://localhost:3000/api/`
 
-Run see script as `bun run index.ts` while server running to seed all.
+Run seed script as `bun run index.ts` while server running to seed all.
 
-Optional flags `--beast` `--relic` `--program` `--biome` to see only set data
+Optional flags `--beast` `--relic` `--program` `--biome` to seed only set data
 
 Example: `bun run index.ts --beast --biome` to seed only biome and beast.
 
