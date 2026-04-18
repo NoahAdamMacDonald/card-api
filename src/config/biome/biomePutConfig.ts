@@ -17,10 +17,10 @@ export const biomePutConfig = {
 	replace: {
 		sql: `
             UPDATE biomes
-            SET name = ?, play_cost = ?, color = ?, bit_effect = ?
+            SET name = ?, image = ?, play_cost = ?, color = ?, bit_effect = ?
             WHERE id = ?
         `,
-		params: (s: any) => [s.name, s.playCost, s.color, s.bitEffect],
+		params: (s: any) => [s.name, s.image, s.playCost, s.color, s.bitEffect],
 	},
 
 	validate(s: any, errors: any[]) {

@@ -4,7 +4,7 @@ export const beastGetConfig = {
 
 	base: {
 		sql: `
-      SELECT id, name, play_cost, level, bts, evo_cost, evo_color
+      SELECT id, name, image, play_cost, level, bts, evo_cost, evo_color
       FROM beasts WHERE id = ?
     `,
 	},
@@ -67,6 +67,7 @@ export const beastGetConfig = {
 			cardType: "beast",
 			stats: {
 				name: base.name,
+				image: base.image,
 				playCost: base.play_cost,
 				level: base.level,
 				BTS: base.bts,

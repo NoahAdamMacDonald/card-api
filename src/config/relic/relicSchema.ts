@@ -7,6 +7,7 @@ import {
 
 export const relicSchema = {
 	name: (v: any) => validateString("name", v),
+	image: (v: any) => validateString("image", v),
 	playCost: (v: any) => validateNumber("playCost", v, { min: 0 }),
 	color: (v: any) => validateString("color", v),
 	bitEffect: (v: any) => validateString("bitEffect", v),

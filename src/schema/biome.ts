@@ -2,6 +2,7 @@ export const biomeSchema = `
 CREATE TABLE IF NOT EXISTS biomes (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
+  image TEXT,
   play_cost INTEGER NOT NULL CHECK (play_cost >= 0),
   color TEXT NOT NULL,
   bit_effect TEXT

@@ -2,6 +2,7 @@ export const beastSchema = `
 CREATE TABLE IF NOT EXISTS beasts (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
+  image TEXT,
   play_cost INTEGER NOT NULL CHECK (play_cost >= 0),
   level INTEGER NOT NULL CHECK (level >= 0),
   bts INTEGER NOT NULL CHECK (bts >= 0),

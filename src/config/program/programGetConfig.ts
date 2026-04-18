@@ -4,7 +4,7 @@ export const programGetConfig = {
 
 	base: {
 		sql: `
-      SELECT id, name, play_cost, color, bit_effect
+      SELECT id, name, image, play_cost, color, bit_effect
       FROM programs WHERE id = ?
     `,
 	},

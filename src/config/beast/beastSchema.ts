@@ -8,6 +8,7 @@ import {
 
 export const beastSchema = {
 	name: (v: any) => validateString("name", v),
+	image: (v: any) => validateString("image", v),
 	playCost: (v: any) => validateNumber("playCost", v, { min: 0 }),
 	level: (v: any) => validateNumber("level", v, { min: 0 }),
 	bts: (v: any) => validateNumber("bts", v, { min: 0 }),

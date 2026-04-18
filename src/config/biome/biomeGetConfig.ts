@@ -4,7 +4,7 @@ export const biomeGetConfig = {
 
 	base: {
 		sql: `
-      SELECT id, name, play_cost, color, bit_effect
+      SELECT id, name, image, play_cost, color, bit_effect
       FROM biomes WHERE id = ?
     `,
 	},
@@ -51,6 +51,7 @@ export const biomeGetConfig = {
 			cardType: "biome",
 			stats: {
 				name: base.name,
+				image: base.image,
 				playCost: base.play_cost,
 				color: base.color,
 				bitEffect: base.bit_effect,

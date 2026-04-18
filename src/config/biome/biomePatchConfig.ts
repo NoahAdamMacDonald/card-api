@@ -19,6 +19,7 @@ export const biomePatchConfig = {
 
 	baseFields: [
 		{ name: "name", sqlField: "name", apply: applyStringUpdate },
+		{ name: "image", sqlField: "image", apply: applyStringUpdate },
 		{ name: "playCost", sqlField: "play_cost", apply: applyNumberUpdate },
 		{ name: "color", sqlField: "color", apply: applyStringUpdate },
 		{ name: "bitEffect", sqlField: "bit_effect", apply: applyStringUpdate },

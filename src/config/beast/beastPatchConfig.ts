@@ -22,6 +22,7 @@ export const beastPatchConfig = {
 
 	baseFields: [
 		{ name: "name", sqlField: "name", apply: applyStringUpdate },
+		{ name: "image", sqlField: "image", apply: applyStringUpdate },
 		{ name: "playCost", sqlField: "play_cost", apply: applyNumberUpdate },
 		{ name: "level", sqlField: "level", apply: applyNumberUpdate },
 		{ name: "bts", sqlField: "bts", apply: applyNumberUpdate },

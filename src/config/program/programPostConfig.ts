@@ -13,10 +13,10 @@ export const programPostConfig = {
 
 	insert: {
 		sql: `
-            INSERT INTO programs (name, play_cost, color, bit_effect)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO programs (name, image, play_cost, color, bit_effect)
+            VALUES (?, ?, ?, ?, ?)
         `,
-		params: (s: any) => [s.name, s.playCost, s.color, s.bitEffect],
+		params: (s: any) => [s.name, s.image, s.playCost, s.color, s.bitEffect],
 	},
 
 	validate(s: any, errors: any[]) {

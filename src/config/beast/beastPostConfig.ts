@@ -14,11 +14,12 @@ export const beastPostConfig = {
 
 	insert: {
 		sql: `
-            INSERT INTO beasts (name, play_cost, level, bts, evo_cost, evo_color)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO beasts (name, image, play_cost, level, bts, evo_cost, evo_color)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         `,
 		params: (s: any) => [
 			s.name,
+			s.image ?? null,
 			s.playCost,
 			s.level ?? 0,
 			s.bts ?? 0,

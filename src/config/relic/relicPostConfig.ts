@@ -9,10 +9,10 @@ export const relicPostConfig = {
 
 	insert: {
 		sql: `
-            INSERT INTO relics (name, play_cost, color, bit_effect)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO relics (name, image, play_cost, color, bit_effect)
+            VALUES (?, ?, ?, ?, ?)
         `,
-		params: (s: any) => [s.name, s.playCost, s.color, s.bitEffect],
+		params: (s: any) => [s.name, s.image, s.playCost, s.color, s.bitEffect],
 	},
 
 	validate(s: any, errors: any[]) {
