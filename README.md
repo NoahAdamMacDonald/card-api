@@ -5,7 +5,7 @@ Available online [https://card-api.fly.dev/](https://card-api.fly.dev)
 A REST API for managing **Beasts**, **Programs**, **Biomes **and **Relics** for a 
 Deck Building Card Game.
 
-Built using **BUN** + **Hono**+ **SQLite**
+Built using **BUN** + **Hono** + **SQLite**
 
 ## Group Members
 _Adam Johnston_ - _Mathew Hatcher_ - _Noah MacDonald_ - _Silas Mahoney_
