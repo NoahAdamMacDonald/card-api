@@ -75,6 +75,7 @@ Tables for all core resources
 CREATE TABLE IF NOT EXISTS beasts (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
+  image TEXT,
   play_cost INTEGER NOT NULL CHECK (play_cost >= 0),
   level INTEGER NOT NULL CHECK (level >= 0),
   bts INTEGER NOT NULL CHECK (bts >= 0),
@@ -88,6 +89,7 @@ CREATE TABLE IF NOT EXISTS beasts (
 CREATE TABLE IF NOT EXISTS biomes (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
+  image TEXT,
   play_cost INTEGER NOT NULL CHECK (play_cost >= 0),
   color TEXT NOT NULL,
   bit_effect TEXT
@@ -100,6 +102,7 @@ CREATE TABLE IF NOT EXISTS biomes (
 CREATE TABLE IF NOT EXISTS programs (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
+  image TEXT,
   play_cost INTEGER NOT NULL CHECK (play_cost >= 0),
   color TEXT NOT NULL,
   bit_effect TEXT
@@ -112,6 +115,7 @@ CREATE TABLE IF NOT EXISTS programs (
 CREATE TABLE IF NOT EXISTS relics (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   name TEXT NOT NULL,
+  image TEXT,
   play_cost INTEGER NOT NULL CHECK (play_cost >= 0),
   color TEXT NOT NULL,
   bit_effect TEXT
@@ -199,6 +203,8 @@ Required for all are `stats` where all other fields are put under
 | effects | no | array of objects `{ text: "string", trigger: string[] }` |
 | soulEffects | no | array of objects `{ trigger: string, available: string, text: string }` |
 | special | no | nullable object `{ name: string, text: string }` |
+| image | no | string |
+
 
 **POST** `/api/beast`
 
@@ -206,6 +212,7 @@ Required for all are `stats` where all other fields are put under
 {
   "stats": {
     "name": "Cyber Wolf",
+    "image": "./cyber-wolf",
     "playCost": 5,
     "level": 2,
     "bts": 3,
@@ -266,6 +273,7 @@ Required for all are `stats` where all other fields are put under
 | effects | no | array of objects `{ text: "string", trigger: string[], available?: string }` |
 | traits | no | array of strings |
 | keywords | no | array of strings |
+| image | no | string |
 
 **POST** `/api/biome`
 
@@ -273,6 +281,7 @@ Required for all are `stats` where all other fields are put under
 {
   "stats": {
     "name": "Crystal Forest",
+    "image": "crystal-forest.png",
     "playCost": 3,
     "color": "green",
     "bitEffect": "All beasts gain +1 BTS while in this biome.",
@@ -313,6 +322,8 @@ Required for all are `stats` where all other fields are put under
 | effects | no | array of objects `{ text: "string", trigger: string[], available?: string }` |
 | traits | no | array of strings |
 | keywords | no | array of strings |
+| image | no | string |
+
 
 **POST** `/api/program`
 
@@ -320,6 +331,7 @@ Required for all are `stats` where all other fields are put under
 {
   "stats": {
     "name": "Data Surge",
+    "image": null,
     "playCost": 2,
     "color": "blue",
     "bitEffect": "Gain 1 extra action this turn.",
@@ -359,6 +371,7 @@ Required for all are `stats` where all other fields are put under
 | bitEffect | Yes | string |
 | effects | no | array of objects `{ text: "string", trigger: string[], available?: string }` |
 | keywords | no | array of strings |
+| image | no | string |
 
 **POST** `/api/relic`
 
@@ -366,6 +379,7 @@ Required for all are `stats` where all other fields are put under
 {
   "stats": {
     "name": "Ancient Core",
+    "image": "./core",
     "playCost": 4,
     "color": "red",
     "bitEffect": "Your beasts gain +1 attack while this relic is active.",
@@ -504,6 +518,7 @@ Fields: if applied, stats only returns fields listed.
   "cardType": "beast",
   "stats": {
     "name": "Cyber Wolf",
+    "image": "./cyber-wolf",
     "playCost": 5,
     "level": 2,
     "BTS": 3,
@@ -685,7 +700,6 @@ Fail
   "success": false
 }
 ```
-
 
 
 
