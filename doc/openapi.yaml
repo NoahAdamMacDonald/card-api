@@ -1,0 +1,767 @@
+openapi: 3.0.3
+info:
+  title: Card API
+  version: 1.0.0
+  description: |
+    REST API for managing Beasts, Biomes, Programs, and Relics
+    for a deck‑building card game.  
+    Built with Bun + Hono + SQLite.
+
+servers:
+  - url: http://localhost:3000/api
+    description: Local development server
+  - url: https://card-api.fly.dev/api
+    description: Production server
+
+paths:
+
+  ###############################################
+  # BEAST ROUTES
+  ###############################################
+
+  /beast:
+    get:
+      summary: Get all beasts
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer }
+        - in: query
+          name: limit
+          schema: { type: integer }
+        - in: query
+          name: name
+          schema: { type: string }
+        - in: query
+          name: evoColor
+          schema: { type: string }
+        - in: query
+          name: minLevel
+          schema: { type: integer }
+        - in: query
+          name: maxLevel
+          schema: { type: integer }
+        - in: query
+          name: minId
+          schema: { type: integer }
+        - in: query
+          name: maxId
+          schema: { type: integer }
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [ASC, DESC]
+      responses:
+        "200":
+          description: List of beasts
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedList"
+
+    post:
+      summary: Create a new beast
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBeastRequest"
+      responses:
+        "200":
+          description: Beast created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /beast/{id}:
+    get:
+      summary: Get a beast by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+        - in: query
+          name: fields
+          schema: { type: string }
+      responses:
+        "200":
+          description: Beast found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BeastResponse"
+        "404":
+          description: Beast not found
+
+    patch:
+      summary: Update part of a beast
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchBeastRequest"
+      responses:
+        "200":
+          description: Beast updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    put:
+      summary: Replace a beast
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBeastRequest"
+      responses:
+        "200":
+          description: Beast replaced
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      summary: Delete a beast
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Beast deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          description: Beast not found
+
+
+  ###############################################
+  # BIOME ROUTES
+  ###############################################
+
+  /biome:
+    get:
+      summary: Get all biomes
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer }
+        - in: query
+          name: limit
+          schema: { type: integer }
+        - in: query
+          name: name
+          schema: { type: string }
+        - in: query
+          name: color
+          schema: { type: string }
+        - in: query
+          name: minId
+          schema: { type: integer }
+        - in: query
+          name: maxId
+          schema: { type: integer }
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [ASC, DESC]
+      responses:
+        "200":
+          description: List of biomes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedList"
+
+    post:
+      summary: Create a biome
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBiomeRequest"
+      responses:
+        "200":
+          description: Biome created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /biome/{id}:
+    get:
+      summary: Get a biome by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Biome found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BiomeResponse"
+        "404":
+          description: Not found
+
+    patch:
+      summary: Update part of a biome
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchBiomeRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateResponse"
+
+    put:
+      summary: Replace a biome
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateBiomeRequest"
+      responses:
+        "200":
+          description: Replaced
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+    delete:
+      summary: Delete a biome
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+
+  ###############################################
+  # PROGRAM ROUTES
+  ###############################################
+
+  /program:
+    get:
+      summary: Get all programs
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer }
+        - in: query
+          name: limit
+          schema: { type: integer }
+        - in: query
+          name: name
+          schema: { type: string }
+        - in: query
+          name: color
+          schema: { type: string }
+        - in: query
+          name: minId
+          schema: { type: integer }
+        - in: query
+          name: maxId
+          schema: { type: integer }
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [ASC, DESC]
+      responses:
+        "200":
+          description: List of programs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedList"
+
+    post:
+      summary: Create a program
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProgramRequest"
+      responses:
+        "200":
+          description: Program created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /program/{id}:
+    get:
+      summary: Get a program by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Program found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProgramResponse"
+
+    patch:
+      summary: Update part of a program
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchProgramRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateResponse"
+
+    put:
+      summary: Replace a program
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProgramRequest"
+      responses:
+        "200":
+          description: Replaced
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+    delete:
+      summary: Delete a program
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+
+  ###############################################
+  # RELIC ROUTES
+  ###############################################
+
+  /relic:
+    get:
+      summary: Get all relics
+      parameters:
+        - in: query
+          name: page
+          schema: { type: integer }
+        - in: query
+          name: limit
+          schema: { type: integer }
+        - in: query
+          name: name
+          schema: { type: string }
+        - in: query
+          name: color
+          schema: { type: string }
+        - in: query
+          name: minId
+          schema: { type: integer }
+        - in: query
+          name: maxId
+          schema: { type: integer }
+        - in: query
+          name: order
+          schema:
+            type: string
+            enum: [ASC, DESC]
+      responses:
+        "200":
+          description: List of relics
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaginatedList"
+
+    post:
+      summary: Create a relic
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRelicRequest"
+      responses:
+        "200":
+          description: Relic created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+  /relic/{id}:
+    get:
+      summary: Get a relic by ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Relic found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RelicResponse"
+
+    patch:
+      summary: Update part of a relic
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PatchRelicRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UpdateResponse"
+
+    put:
+      summary: Replace a relic
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateRelicRequest"
+      responses:
+        "200":
+          description: Replaced
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+    delete:
+      summary: Delete a relic
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        "200":
+          description: Deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+
+
+###############################################
+# COMPONENT SCHEMAS
+###############################################
+
+components:
+  schemas:
+
+    ###############################################
+    # Shared
+    ###############################################
+
+    PaginatedList:
+      type: object
+      properties:
+        page: { type: integer }
+        limit: { type: integer }
+        count: { type: integer }
+        results:
+          type: array
+          items:
+            type: object
+            properties:
+              id: { type: integer }
+              name: { type: string }
+
+    SuccessResponse:
+      type: object
+      properties:
+        message: { type: string }
+        success: { type: boolean }
+
+    UpdateResponse:
+      type: object
+      properties:
+        message: { type: string }
+        success: { type: boolean }
+        updatedFields:
+          type: array
+          items: { type: string }
+
+    ErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+        success:
+          type: boolean
+
+    Effect:
+      type: object
+      properties:
+        text: { type: string }
+        trigger:
+          type: array
+          items: { type: string }
+        available:
+          type: string
+          nullable: true
+
+    SoulEffect:
+      type: object
+      properties:
+        trigger: { type: string }
+        available: { type: string }
+        text: { type: string }
+
+    Special:
+      type: object
+      properties:
+        name: { type: string }
+        text: { type: string }
+
+    ###############################################
+    # Beast Schemas
+    ###############################################
+
+    Beast:
+      type: object
+      required: [name, playCost, level, evoCost, evoColor]
+      properties:
+        name: { type: string }
+        image: { type: string, nullable: true }
+        playCost: { type: integer }
+        level: { type: integer }
+        bts: { type: integer }
+        evoCost: { type: integer }
+        evoColor: { type: string }
+        traits:
+          type: array
+          items: { type: string }
+        keywords:
+          type: array
+          items: { type: string }
+        restrictions:
+          type: array
+          items: { type: string }
+        effects:
+          type: array
+          items:
+            $ref: "#/components/schemas/Effect"
+        soulEffects:
+          type: array
+          items:
+            $ref: "#/components/schemas/SoulEffect"
+        special:
+          $ref: "#/components/schemas/Special"
+          nullable: true
+
+    CreateBeastRequest:
+      type: object
+      properties:
+        stats:
+          $ref: "#/components/schemas/Beast"
+
+    PatchBeastRequest:
+      type: object
+      properties:
+        stats:
+          type: object
+          additionalProperties: true
+
+    BeastResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        cardType: { type: string }
+        stats:
+          $ref: "#/components/schemas/Beast"
+
+
+    ###############################################
+    # Biome Schemas
+    ###############################################
+
+    Biome:
+      type: object
+      required: [name, playCost, color, bitEffect]
+      properties:
+        name: { type: string }
+        image: { type: string, nullable: true }
+        playCost: { type: integer }
+        color: { type: string }
+        bitEffect: { type: string }
+        effects:
+          type: array
+          items:
+            $ref: "#/components/schemas/Effect"
+        traits:
+          type: array
+          items: { type: string }
+        keywords:
+          type: array
+          items: { type: string }
+
+    CreateBiomeRequest:
+      type: object
+      properties:
+        stats:
+          $ref: "#/components/schemas/Biome"
+
+    PatchBiomeRequest:
+      type: object
+      properties:
+        stats:
+          type: object
+          additionalProperties: true
+
+    BiomeResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        cardType: { type: string }
+        stats:
+          $ref: "#/components/schemas/Biome"
+
+
+    ###############################################
+    # Program Schemas
+    ###############################################
+
+    Program:
+      type: object
+      required: [name, playCost, color, bitEffect]
+      properties:
+        name: { type: string }
+        image: { type: string, nullable: true }
+        playCost: { type: integer }
+        color: { type: string }
+        bitEffect: { type: string }
+        effects:
+          type: array
+          items:
+            $ref: "#/components/schemas/Effect"
+        traits:
+          type: array
+          items: { type: string }
+        keywords:
+          type: array
+          items: { type: string }
+
+    CreateProgramRequest:
+      type: object
+      properties:
+        stats:
+          $ref: "#/components/schemas/Program"
+
+    PatchProgramRequest:
+      type: object
+      properties:
+        stats:
