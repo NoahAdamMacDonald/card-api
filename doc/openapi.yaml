@@ -776,3 +776,44 @@ components:
 
     ProgramResponse:
       type:
+
+    ###############################################
+    # Relic Schemas
+    ###############################################
+
+    Relic:
+      type: object
+      required: [name, playCost, color, bitEffect]
+      properties:
+        name: { type: string }
+        image: { type: string, nullable: true }
+        playCost: { type: integer }
+        color: { type: string }
+        bitEffect: { type: string }
+        effects:
+          type: array
+          items:
+            $ref: "#/components/schemas/Effect"
+        keywords:
+          type: array
+          items: { type: string }
+
+    CreateRelicRequest:
+      type: object
+      properties:
+        stats:
+          $ref: "#/components/schemas/Relic"
+
+    PatchRelicRequest:
+      type: object
+      properties:
+        stats:
+          type: object
+
+    RelicResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        cardType: { type: string }
+        stats:
+          $ref: "#/components/schemas/Relic"
