@@ -8,9 +8,9 @@ info:
     Built with Bun + Hono + SQLite.
 
 servers:
-  - url: http://localhost:3000/api
+  - url: http://localhost:3000/api/
     description: Local development server
-  - url: https://card-api.fly.dev/api
+  - url: https://card-api.fly.dev/api/
     description: Production server
 
 paths:
@@ -135,7 +135,7 @@ paths:
         - in: path
           name: id
           required: true
-          schema: { type: integer }
+          schema: { type:integer }
       requestBody:
         content:
           application/json:
@@ -161,7 +161,7 @@ paths:
         - in: path
           name: id
           required: true
-          schema: { type: integer }
+          schema: { type:integer }
       responses:
         "200":
           description: Beast deleted
@@ -235,6 +235,9 @@ paths:
           name: id
           required: true
           schema: { type: integer }
+        - in: query
+          name: fields
+          schema: { type: string }
       responses:
         "200":
           description: Biome found
@@ -363,6 +366,9 @@ paths:
           name: id
           required: true
           schema: { type: integer }
+        - in: query
+          name: fields
+          schema: { type: string }
       responses:
         "200":
           description: Program found
@@ -489,6 +495,9 @@ paths:
           name: id
           required: true
           schema: { type: integer }
+        - in: query
+          name: fields
+          schema: { type: string }
       responses:
         "200":
           description: Relic found
@@ -674,7 +683,6 @@ components:
       properties:
         stats:
           type: object
-          additionalProperties: true
 
     BeastResponse:
       type: object
@@ -720,7 +728,6 @@ components:
       properties:
         stats:
           type: object
-          additionalProperties: true
 
     BiomeResponse:
       type: object
@@ -765,3 +772,7 @@ components:
       type: object
       properties:
         stats:
+          type: object
+
+    ProgramResponse:
+      type:
