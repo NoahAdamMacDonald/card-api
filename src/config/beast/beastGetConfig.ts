@@ -73,6 +73,7 @@ export const beastGetConfig = {
 				BTS: base.bts,
 				evoCost: base.evo_cost,
 				evoColor: base.evo_color,
+				bitEffect: base.bit_effect,
 				effects: effectsWithTriggers,
 				special: nested.special,
 				soulEffects: nested.soulEffects,
