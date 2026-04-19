@@ -7,7 +7,14 @@ import { relicSchema } from "./schema/relic";
 
 import { existsSync, mkdirSync } from "node:fs";
 
-const DATA_DIR = "/app/data";
+const isFly = process.env.FLY_APP_NAME !== undefined;
+
+const LOCAL_DATA_DIR = "./data";
+
+const FLY_DATA_DIR = "/app/data";
+
+// Choose correct directory
+const DATA_DIR = isFly ? FLY_DATA_DIR : LOCAL_DATA_DIR;
 
 //create data folder
 if (!existsSync(DATA_DIR)) {
