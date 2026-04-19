@@ -14,8 +14,8 @@ export const beastPostConfig = {
 
 	insert: {
 		sql: `
-            INSERT INTO beasts (name, image, play_cost, level, bts, evo_cost, evo_color)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO beasts (name, image, play_cost, level, bts, evo_cost, evo_color, bit_effect)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `,
 		params: (s: any) => [
 			s.name,
@@ -25,6 +25,7 @@ export const beastPostConfig = {
 			s.bts ?? 0,
 			s.evoCost ?? 0,
 			s.evoColor ?? "colorless",
+			s.bitEffect ?? null,
 		],
 	},
 

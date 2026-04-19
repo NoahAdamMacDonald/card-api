@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS beasts (
   level INTEGER NOT NULL CHECK (level >= 0),
   bts INTEGER NOT NULL CHECK (bts >= 0),
   evo_cost INTEGER NOT NULL CHECK (evo_cost >= 0),
-  evo_color TEXT NOT NULL
+  evo_color TEXT NOT NULL,
+  bit_effect TEXT
 );
 
 CREATE TABLE IF NOT EXISTS beast_effects (

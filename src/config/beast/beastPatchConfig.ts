@@ -28,6 +28,7 @@ export const beastPatchConfig = {
 		{ name: "bts", sqlField: "bts", apply: applyNumberUpdate },
 		{ name: "evoCost", sqlField: "evo_cost", apply: applyNumberUpdate },
 		{ name: "evoColor", sqlField: "evo_color", apply: applyStringUpdate },
+		{ name: "bitEffect", sqlField: "bit_effect", apply: applyStringUpdate },
 	],
 
 	validateNested(s: any, errors: any[]) {

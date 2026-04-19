@@ -20,7 +20,7 @@ export const beastPutConfig = {
 	replace: {
 		sql: `
             UPDATE beasts
-            SET name = ?, image = ?, play_cost = ?, level = ?, bts = ?, evo_cost = ?, evo_color = ?
+            SET name = ?, image = ?, play_cost = ?, level = ?, bts = ?, evo_cost = ?, evo_color = ?, bit_effect = ?
             WHERE id = ?
         `,
 		params: (s: any) => [
@@ -31,6 +31,7 @@ export const beastPutConfig = {
 			s.bts,
 			s.evoCost,
 			s.evoColor,
+			s.bitEffect
 		],
 	},
 

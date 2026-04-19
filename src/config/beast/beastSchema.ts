@@ -14,6 +14,7 @@ export const beastSchema = {
 	bts: (v: any) => validateNumber("bts", v, { min: 0 }),
 	evoCost: (v: any) => validateNumber("evoCost", v, { min: 0 }),
 	evoColor: (v: any) => validateString("evoColor", v),
+	bitEffect: (v: any) => (v ? validateString("bitEffect", v) : null),
 
 	traits: (v: any) => validateStringArray("traits", v),
 	keywords: (v: any) => validateStringArray("keywords", v),

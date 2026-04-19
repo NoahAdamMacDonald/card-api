@@ -4,7 +4,7 @@ export const beastGetConfig = {
 
 	base: {
 		sql: `
-      SELECT id, name, image, play_cost, level, bts, evo_cost, evo_color
+      SELECT id, name, image, play_cost, level, bts, evo_cost, evo_color, bit_effect
       FROM beasts WHERE id = ?
     `,
 	},
