@@ -7,12 +7,14 @@ import { relicSchema } from "./schema/relic";
 
 import { existsSync, mkdirSync } from "node:fs";
 
+const DATA_DIR = "/app/data";
+
 //create data folder
-if (!existsSync("./data")) {
-	mkdirSync("./data", { recursive: true });
+if (!existsSync(DATA_DIR)) {
+	mkdirSync(DATA_DIR, { recursive: true });
 }
 
-export const db = new Database("/data/database.sqlite");
+export const db = new Database(`${DATA_DIR}/database.sqlite`);
 
 db.run(`PRAGMA foreign_keys = ON;`);
 
