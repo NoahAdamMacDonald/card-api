@@ -221,7 +221,9 @@ Required for all are `stats` where all other fields are put under
 | effects | no | array of objects `{ text: "string", trigger: string[] }` |
 | soulEffects | no | array of objects `{ trigger: string, available: string, text: string }` |
 | special | no | nullable object `{ name: string, text: string }` |
-| image | no | string |
+| image | no | string / null |
+| bitEffect | no | string / null |
+
 
 
 **POST** `/api/beast`
@@ -236,6 +238,7 @@ Required for all are `stats` where all other fields are put under
     "bts": 3,
     "evoCost": 4,
     "evoColor": "blue",
+    "bitEffect": null,
     "traits": [
       "Beast",
       "Cyber"
@@ -542,6 +545,7 @@ Fields: if applied, stats only returns fields listed.
     "BTS": 3,
     "evoCost": 4,
     "evoColor": "blue",
+    "bitEffect": null,
     "effects": [
       {
         "trigger": [
