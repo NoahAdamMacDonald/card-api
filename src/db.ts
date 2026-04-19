@@ -12,7 +12,7 @@ if (!existsSync("./data")) {
 	mkdirSync("./data", { recursive: true });
 }
 
-export const db = new Database("./data/database.sqlite");
+export const db = new Database("/data/database.sqlite");
 
 db.run(`PRAGMA foreign_keys = ON;`);
 
