@@ -651,6 +651,7 @@ components:
         bts: { type: integer }
         evoCost: { type: integer }
         evoColor: { type: string }
+        bitEffect: { type: string, nullable: true }
         traits:
           type: array
           items: { type: string }

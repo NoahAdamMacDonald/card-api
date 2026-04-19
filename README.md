@@ -294,7 +294,7 @@ Required for all are `stats` where all other fields are put under
 | effects | no | array of objects `{ text: "string", trigger: string[], available?: string }` |
 | traits | no | array of strings |
 | keywords | no | array of strings |
-| image | no | string |
+| image | no | string / null |
 
 **POST** `/api/biome`
 
@@ -343,7 +343,7 @@ Required for all are `stats` where all other fields are put under
 | effects | no | array of objects `{ text: "string", trigger: string[], available?: string }` |
 | traits | no | array of strings |
 | keywords | no | array of strings |
-| image | no | string |
+| image | no | string / null |
 
 
 **POST** `/api/program`
@@ -392,7 +392,7 @@ Required for all are `stats` where all other fields are put under
 | bitEffect | Yes | string |
 | effects | no | array of objects `{ text: "string", trigger: string[], available?: string }` |
 | keywords | no | array of strings |
-| image | no | string |
+| image | no | string / null |
 
 **POST** `/api/relic`
 
