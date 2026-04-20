@@ -52,6 +52,7 @@ export const programGetConfig = {
 			stats: {
 				name: base.name,
 				playCost: base.play_cost,
+				image: base.image,
 				color: base.color,
 				bitEffect: base.bit_effect,
 				effects: effectsWithTriggers,
