@@ -21,7 +21,7 @@ const data = new Hono();
 data.get("/", (c) => {
     //Filters
 	const page = Number(c.req.query("page") ?? 1);
-	const limit = Number(c.req.query("limit") ?? 20);
+	const limit = Number(c.req.query("limit") ?? 40);
 	const name = c.req.query("name") ?? null;
 	const color = c.req.query("color") ?? null;
 	const minId =
